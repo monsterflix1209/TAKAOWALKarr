@@ -53,8 +53,8 @@
             display: flex;
             justify-content: center;
             align-items: flex-end;
-            /* ⬆️ 向上抬高並整合 iOS 安全區域 */
-            padding-bottom: calc(11vh + env(safe-area-inset-bottom, 20px));
+            /* ⬆️ 再往上抬高，確保避開 Safari 下方網址列 */
+            padding-bottom: calc(18vh + env(safe-area-inset-bottom, 30px));
             background-color: #f7f5f0;
             overflow: hidden;
         }
