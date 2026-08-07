@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TAKAO WALK arr!</title>
     
+    <!-- 🌸 遊戲瀏覽器圖標 -->
+    <link rel="icon" href="./icon.png" type="image/png">
+    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -39,7 +42,7 @@
             z-index: 1;
         }
 
-        /* 🔒 滿版強制登入遮罩 */
+        /* 🔒 滿版強制登入遮罩 / 封面 */
         .login-overlay {
             position: fixed;
             top: 0;
@@ -60,12 +63,45 @@
 
         .login-card {
             background: #ffffff;
-            padding: 36px 28px;
+            padding: 28px 24px;
             border-radius: 32px;
             box-shadow: 0 20px 40px rgba(180, 160, 150, 0.25);
             border: 2px solid #ffffff;
             max-width: 340px;
             width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        /* 🖼️ 響應式封面樣式 */
+        .cover-picture {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .cover-image {
+            width: 100%;
+            max-width: 280px;
+            max-height: 45vh;
+            object-fit: contain;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+        }
+
+        /* 💻 橫向螢幕（電腦/平板橫放）微調 */
+        @media (orientation: landscape) {
+            .login-card {
+                max-width: 460px;
+                padding: 20px 28px;
+            }
+            .cover-image {
+                max-width: 380px;
+                max-height: 50vh;
+            }
         }
 
         .full-line-btn {
@@ -78,7 +114,7 @@
             font-weight: 800;
             font-size: 1rem;
             cursor: pointer;
-            margin-top: 20px;
+            margin-top: 8px;
             box-shadow: 0 6px 16px rgba(6, 199, 85, 0.3);
             transition: transform 0.1s ease;
         }
@@ -217,11 +253,15 @@
 </head>
 <body>
 
-    <!-- 🔒 未登入強制遮罩 -->
+    <!-- 🔒 未登入強制遮罩 / 響應式封面 -->
     <div class="login-overlay" id="login-overlay">
         <div class="login-card">
-            <div style="font-size: 3.5rem; margin-bottom: 12px;">🌸</div>
-            <h2 style="color: #ff758c; font-weight: 800;">TAKAO WALK arr!</h2>
+            <picture class="cover-picture">
+                <!-- 橫向裝置（電腦 / 平板橫放）使用 cover_computer.png -->
+                <source media="(orientation: landscape)" srcset="./cover_computer.png">
+                <!-- 直向裝置（手機 / 平板直放）預設使用 cover_phone.png -->
+                <img src="./cover_phone.png" alt="TAKAO WALK arr!" class="cover-image">
+            </picture>
             <button class="full-line-btn" onclick="loginWithLine()">使用 LINE 帳號登入</button>
         </div>
     </div>
@@ -259,7 +299,7 @@
     </div>
 
     <script>
-        // ⚙️ 設定區（網址與 Channel ID 皆已填入）
+        // ⚙️ 設定區
         const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbx-ZuM0QX6rncNxsUcBct7CIcK89UVhgn3KOsJiPRug4NIFzTzX3LdtCUgd-546oRSJSQ/exec';
         const LINE_CHANNEL_ID = '2011007742';
 
