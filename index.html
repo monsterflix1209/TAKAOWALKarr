@@ -177,6 +177,18 @@
             margin-top: 2px;
         }
 
+        /* 📍 即時路名樣式 */
+        .road-name {
+            font-size: 0.72rem;
+            color: #e63946;
+            font-weight: 700;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+
         /* 🎵 音樂切換按鈕樣式 */
         .bgm-btn {
             background: #ffffff;
@@ -334,6 +346,7 @@
         <div class="brand-container">
             <div class="brand-title">🌸 TAKAO WALK arr!</div>
             <div class="user-name" id="user-name">👤 驗證中...</div>
+            <div class="road-name" id="road-name">📍 定位中...</div>
         </div>
         <div id="auth-action-area" style="display: flex; gap: 8px; align-items: center;">
             <button class="bgm-btn" id="bgm-btn" onclick="toggleBGM()">🔇</button>
@@ -369,6 +382,7 @@
         let currentLineId = null;
         let currentName = null;
         let isBgmPlaying = false;
+        let lastGeocodeCoords = null;
 
         // 🟡 景點資料庫（各自指定獨立金幣圖片）
         const spots = [
@@ -386,11 +400,11 @@
         let totalDistanceMeters = 0;
         let previousPosition = null;
 
-        // 🎵 背景音樂控制功能
+        // 🎵 背景音樂控制功能（音量調小至 8%）
         function startBGM() {
             const bgm = document.getElementById('bgm');
             const btn = document.getElementById('bgm-btn');
-            bgm.volume = 0.2; // 🔊 將音量調低至 20%
+            bgm.volume = 0.08; 
             
             bgm.play().then(() => {
                 isBgmPlaying = true;
@@ -408,11 +422,31 @@
                 bgm.pause();
                 btn.innerText = '🔇';
             } else {
-                bgm.volume = 0.2;
+                bgm.volume = 0.08;
                 bgm.play();
                 btn.innerText = '🎵';
             }
             isBgmPlaying = !isBgmPlaying;
+        }
+
+        // 🗺️ 即時路名 API 查詢（加入移動超 30m 防重複請求機制）
+        function fetchRoadName(lat, lng) {
+            if (lastGeocodeCoords && getDistance(lastGeocodeCoords[0], lastGeocodeCoords[1], lat, lng) < 30) {
+                return;
+            }
+            lastGeocodeCoords = [lat, lng];
+
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.address) {
+                        const road = data.address.road || data.address.pedestrian || data.address.suburb || data.address.neighbourhood || '高雄探索中';
+                        document.getElementById('road-name').innerText = `📍 ${road}`;
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('road-name').innerText = `📍 搜尋路名中...`;
+                });
         }
 
         function initMap() {
@@ -451,7 +485,7 @@
         }
 
         function loginWithLine() {
-            startBGM(); // 點擊時播放音樂
+            startBGM();
             const redirectUri = encodeURIComponent(GAS_API_URL);
             const lineAuthUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CHANNEL_ID}&redirect_uri=${redirectUri}&state=takaowalk&scope=profile%20openid`;
             window.location.href = lineAuthUrl;
@@ -459,7 +493,7 @@
 
         /* ⚠️ 測試專用：跳過登入函式 (正式上線前刪除此段) */
         function skipLoginForTesting() {
-            startBGM(); // 點擊時播放音樂
+            startBGM();
             document.getElementById('login-overlay').style.display = 'none';
             currentLineId = 'test_guest';
             currentName = '測試玩家';
@@ -527,7 +561,11 @@
                 }
             } else {
                 previousPosition = coords;
+                map.panTo(coords); // 💡 首次取得 GPS 定位時自動將地圖對焦至玩家位置
             }
+
+            // 更新即時路名
+            fetchRoadName(coords[0], coords[1]);
 
             const walkedEl = document.getElementById('total-walked');
             if (walkedEl) walkedEl.innerText = `🚶 ${(totalDistanceMeters / 1000).toFixed(2)} km`;
