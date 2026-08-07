@@ -170,23 +170,16 @@
             gap: 6px;
         }
 
-        .user-name {
-            font-size: 0.75rem;
-            color: #4a4e69;
-            font-weight: 700;
-            margin-top: 2px;
-        }
-
-        /* 📍 即時路名樣式 */
+        /* 📍 即時路名樣式 (顯示：縣市 + 鄉鎮區 + 路名) */
         .road-name {
             font-size: 0.72rem;
             color: #e63946;
             font-weight: 700;
-            margin-top: 2px;
+            margin-top: 3px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 150px;
+            max-width: 220px;
         }
 
         /* 🎵 音樂切換按鈕樣式 */
@@ -344,8 +337,8 @@
 
     <div class="hud-top">
         <div class="brand-container">
-            <div class="brand-title">🌸 TAKAO WALK arr!</div>
-            <div class="user-name" id="user-name">👤 驗證中...</div>
+            <!-- 🌸 標題改為動態顯示：🌸 xxx 冒險家 -->
+            <div class="brand-title" id="brand-title">🌸 驗證中... 冒險家</div>
             <div class="road-name" id="road-name">📍 定位中...</div>
         </div>
         <div id="auth-action-area" style="display: flex; gap: 8px; align-items: center;">
@@ -429,19 +422,24 @@
             isBgmPlaying = !isBgmPlaying;
         }
 
-        // 🗺️ 即時路名 API 查詢（加入移動超 30m 防重複請求機制）
+        // 🗺️ 即時逆地理編碼：解析「縣市 + 鄉鎮區 + 路名」
         function fetchRoadName(lat, lng) {
             if (lastGeocodeCoords && getDistance(lastGeocodeCoords[0], lastGeocodeCoords[1], lat, lng) < 30) {
                 return;
             }
             lastGeocodeCoords = [lat, lng];
 
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=zh-TW`)
                 .then(res => res.json())
                 .then(data => {
                     if (data && data.address) {
-                        const road = data.address.road || data.address.pedestrian || data.address.suburb || data.address.neighbourhood || '高雄探索中';
-                        document.getElementById('road-name').innerText = `📍 ${road}`;
+                        const addr = data.address;
+                        const city = addr.city || addr.county || addr.state || '';
+                        const district = addr.suburb || addr.town || addr.district || addr.city_district || addr.village || '';
+                        const road = addr.road || addr.pedestrian || addr.street || addr.neighbourhood || '';
+                        
+                        const fullAddress = [city, district, road].filter(Boolean).join(' ');
+                        document.getElementById('road-name').innerText = fullAddress ? `📍 ${fullAddress}` : '📍 高雄探索中';
                     }
                 })
                 .catch(() => {
@@ -497,7 +495,7 @@
             document.getElementById('login-overlay').style.display = 'none';
             currentLineId = 'test_guest';
             currentName = '測試玩家';
-            document.getElementById('user-name').innerText = `👤 ${currentName}`;
+            document.getElementById('brand-title').innerText = `🌸 ${currentName} 冒險家`;
             totalDistanceMeters = 0;
             document.getElementById('total-walked').innerText = `🚶 0.00 km`;
             updateProgressUI();
@@ -512,11 +510,11 @@
                 document.getElementById('login-overlay').style.display = 'none';
 
                 currentLineId = params.get('line_id');
-                currentName = params.get('name');
+                currentName = params.get('name') || '冒險家';
                 const savedDist = parseFloat(params.get('dist') || '0');
                 const savedSpots = (params.get('spots') || '').split(',');
 
-                document.getElementById('user-name').innerText = `👤 ${currentName}`;
+                document.getElementById('brand-title').innerText = `🌸 ${currentName} 冒險家`;
                 totalDistanceMeters = savedDist * 1000;
                 document.getElementById('total-walked').innerText = `🚶 ${savedDist.toFixed(2)} km`;
 
@@ -564,7 +562,7 @@
                 map.panTo(coords); // 💡 首次取得 GPS 定位時自動將地圖對焦至玩家位置
             }
 
-            // 更新即時路名
+            // 更新「縣市 + 鄉鎮區 + 路名」
             fetchRoadName(coords[0], coords[1]);
 
             const walkedEl = document.getElementById('total-walked');
