@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>TAKAO WALK arr!</title>
     
-    <!-- 🌸 遊戲瀏覽器圖標 (SVG 格式) -->
+    <!-- 🌸 遊戲瀏覽器圖標 -->
     <link rel="icon" href="logo.svg" type="image/svg+xml">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -14,9 +14,10 @@
     <style>
         :root {
             --pastel-bg: #fffcf5;
-            --pastel-card: rgba(255, 255, 255, 0.92);
+            --pastel-card: rgba(255, 255, 255, 0.95);
             --pastel-pink: #ffb7c5;
             --pastel-yellow: #ffd3b6;
+            --pastel-accent: #ff758c;
             --text-color: #5c544d;
         }
 
@@ -47,14 +48,11 @@
             z-index: 1;
         }
 
-        /* 🔒 滿版登入遮罩 */
+        /* 🔒 登入遮罩 */
         .login-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            height: 100dvh;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh; height: 100dvh;
             z-index: 3000;
             display: flex;
             justify-content: center;
@@ -64,221 +62,96 @@
             overflow: hidden;
         }
 
-        /* 🖼️ 背景圖片設定 */
         .bg-cover-picture {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            height: 100dvh;
-            z-index: 1;
-            display: block;
+            position: absolute; top: 0; left: 0;
+            width: 100vw; height: 100vh; height: 100dvh;
+            z-index: 1; display: block;
         }
 
         .bg-cover-image {
-            width: 100vw;
-            height: 100vh;
-            height: 100dvh;
-            object-fit: cover;
-            object-position: center;
-            display: block;
+            width: 100vw; height: 100vh; height: 100dvh;
+            object-fit: cover; object-position: center;
         }
 
-        /* 🔘 按鈕區塊 */
         .login-content {
-            position: relative;
-            z-index: 2;
-            width: 85%;
-            max-width: 320px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            justify-content: center;
-            align-items: center;
+            position: relative; z-index: 2;
+            width: 85%; max-width: 320px;
+            display: flex; flex-direction: column; gap: 12px;
+            justify-content: center; align-items: center;
         }
 
         .full-line-btn {
-            width: 100%;
-            background-color: #06C755;
-            color: white;
-            border: none;
-            padding: 16px 24px;
-            border-radius: 30px;
-            font-weight: 800;
-            font-size: 1.1rem;
-            cursor: pointer;
+            width: 100%; background-color: #06C755; color: white;
+            border: none; padding: 16px 24px; border-radius: 30px;
+            font-weight: 800; font-size: 1.1rem; cursor: pointer;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
-            transition: transform 0.15s ease, background-color 0.2s;
-            letter-spacing: 0.5px;
+            transition: transform 0.15s ease;
         }
+        .full-line-btn:active { transform: scale(0.96); }
 
-        .full-line-btn:active {
-            transform: scale(0.96);
-        }
-
-        /* ⚠️ 測試專用：跳過按鈕樣式 */
         .test-skip-btn {
-            width: 100%;
-            background-color: rgba(255, 255, 255, 0.9);
-            color: #5c544d;
-            border: 2px dashed #ff758c;
-            padding: 12px 20px;
-            border-radius: 30px;
-            font-weight: 800;
-            font-size: 0.95rem;
-            cursor: pointer;
+            width: 100%; background-color: rgba(255, 255, 255, 0.9);
+            color: #5c544d; border: 2px dashed #ff758c; padding: 12px 20px;
+            border-radius: 30px; font-weight: 800; font-size: 0.95rem; cursor: pointer;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-            transition: transform 0.15s ease, background-color 0.2s;
         }
+        .test-skip-btn:active { transform: scale(0.96); }
 
-        .test-skip-btn:active {
-            transform: scale(0.96);
-        }
-
+        /* HUD 介面 */
         .hud-top {
             position: absolute;
             top: calc(15px + env(safe-area-inset-top, 0px));
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            width: 90%;
-            max-width: 420px;
-            background: var(--pastel-card);
-            backdrop-filter: blur(8px);
-            padding: 12px 18px;
-            border-radius: 20px;
+            left: 50%; transform: translateX(-50%);
+            z-index: 1000; width: 90%; max-width: 420px;
+            background: var(--pastel-card); backdrop-filter: blur(8px);
+            padding: 12px 18px; border-radius: 20px;
             box-shadow: 0 8px 20px rgba(180, 160, 150, 0.15);
             border: 2px solid #ffffff;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
         }
 
-        .brand-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
+        .brand-container { display: flex; flex-direction: column; align-items: flex-start; }
+        .brand-title { font-weight: 800; font-size: 1.05rem; color: #ff758c; }
+        .road-name { font-size: 0.72rem; color: #e63946; font-weight: 700; margin-top: 3px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .brand-title {
-            font-weight: 800;
-            font-size: 1.05rem;
-            color: #ff758c;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        /* 📍 即時路名樣式 (顯示：縣市 + 鄉鎮區 + 路名) */
-        .road-name {
-            font-size: 0.72rem;
-            color: #e63946;
-            font-weight: 700;
-            margin-top: 3px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 220px;
-        }
-
-        /* 🎵 音樂切換按鈕樣式 */
         .bgm-btn {
-            background: #ffffff;
-            border: 2px solid #ffccd5;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-            transition: transform 0.15s ease;
-        }
-
-        .bgm-btn:active {
-            transform: scale(0.9);
+            background: #ffffff; border: 2px solid #ffccd5; border-radius: 50%;
+            width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
         }
 
         .dist-tracker {
-            font-size: 0.85rem;
-            background: #fff0f3;
-            padding: 6px 12px;
-            border-radius: 14px;
-            color: #ff4d6d;
-            font-weight: 800;
-            white-space: nowrap;
-            border: 1px solid #ffccd5;
+            font-size: 0.85rem; background: #fff0f3; padding: 6px 12px;
+            border-radius: 14px; color: #ff4d6d; font-weight: 800; border: 1px solid #ffccd5;
         }
 
         .hud-bottom {
             position: absolute;
             bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            width: 90%;
-            max-width: 420px;
-            background: var(--pastel-card);
-            backdrop-filter: blur(8px);
-            padding: 16px;
-            border-radius: 24px;
+            left: 50%; transform: translateX(-50%);
+            z-index: 1000; width: 90%; max-width: 420px;
+            background: var(--pastel-card); backdrop-filter: blur(8px);
+            padding: 16px; border-radius: 24px;
             box-shadow: 0 10px 25px rgba(180, 160, 150, 0.18);
-            border: 2px solid #ffffff;
-            text-align: center;
+            border: 2px solid #ffffff; text-align: center;
         }
 
         .target-title { font-size: 0.85rem; color: #8a817c; margin-bottom: 4px; }
-        .target-name { 
-            font-size: 1.25rem; 
-            font-weight: 800; 
-            color: #4a4e69; 
-            margin-bottom: 6px; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
+        .target-name { font-size: 1.25rem; font-weight: 800; color: #4a4e69; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .target-dist { font-size: 0.95rem; color: #ff7f50; font-weight: 700; }
 
-        .progress-bar-bg {
-            width: 100%; height: 10px; background: #e9ecef;
-            border-radius: 10px; margin-top: 10px; overflow: hidden;
-        }
+        .progress-bar-bg { width: 100%; height: 10px; background: #e9ecef; border-radius: 10px; margin-top: 10px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--pastel-pink), var(--pastel-yellow)); border-radius: 10px; transition: width 0.5s ease; }
 
-        .progress-bar-fill {
-            height: 100%; width: 0%;
-            background: linear-gradient(90deg, var(--pastel-pink), var(--pastel-yellow));
-            border-radius: 10px; transition: width 0.5s ease;
-        }
-
-        /* 🪙 金幣圖示樣式 */
-        .coin-icon-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .coin-icon-img {
-            width: 36px;
-            height: 36px;
-            object-fit: contain;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25));
-        }
-
-        .hud-coin-img {
-            width: 22px;
-            height: 22px;
-            object-fit: contain;
-        }
+        .coin-icon-wrapper { display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .coin-icon-img { width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); transition: transform 0.2s; }
+        .coin-icon-img:active { transform: scale(0.85); }
+        .hud-coin-img { width: 22px; height: 22px; object-fit: contain; }
 
         .player-avatar {
             width: 24px; height: 24px; background-color: #3a86ff;
             border: 3px solid #ffffff; border-radius: 50%;
-            box-shadow: 0 0 12px rgba(58, 134, 255, 0.6);
-            animation: pulse 1.8s infinite;
+            box-shadow: 0 0 12px rgba(58, 134, 255, 0.6); animation: pulse 1.8s infinite;
         }
 
         @keyframes pulse {
@@ -287,9 +160,101 @@
             100% { box-shadow: 0 0 0 0 rgba(58, 134, 255, 0); }
         }
 
+        /* 🍄 皮克敏風格景點解鎖視窗 */
+        .pikmin-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh;
+            z-index: 2500; background: rgba(20, 20, 25, 0.65); backdrop-filter: blur(6px);
+            justify-content: center; align-items: flex-end;
+        }
+
+        .pikmin-card {
+            width: 100%; max-width: 460px; height: 88vh; height: 88dvh;
+            background: linear-gradient(180deg, #fff3f5 0%, #ffffff 40%);
+            border-radius: 32px 32px 0 0; display: flex; flex-direction: column;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3); overflow: hidden;
+            animation: slideUp 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        /* 上方 3/4 區域：金幣展示 */
+        .pikmin-top-stage {
+            flex: 1.2; position: relative; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            background: radial-gradient(circle, rgba(255,235,238,1) 0%, rgba(255,255,255,0) 70%);
+            padding: 20px;
+        }
+
+        .pikmin-close-btn {
+            position: absolute; top: 20px; right: 20px; width: 36px; height: 36px;
+            background: rgba(255, 255, 255, 0.9); border: none; border-radius: 50%;
+            font-size: 1.2rem; font-weight: bold; color: #5c544d; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center;
+            z-index: 10;
+        }
+
+        .pikmin-coin-display {
+            width: 160px; height: 160px; object-fit: contain;
+            filter: drop-shadow(0 15px 25px rgba(255, 117, 140, 0.35));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(3deg); }
+        }
+
+        /* 下方資訊欄與答題區 */
+        .pikmin-bottom-sheet {
+            background: #ffffff; padding: 24px; border-radius: 30px 30px 0 0;
+            box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.05); border-top: 1px solid #ffeef0;
+            display: flex; flex-direction: column; gap: 12px;
+        }
+
+        .pikmin-spot-title { font-size: 1.4rem; font-weight: 800; color: #4a4e69; text-align: center; }
+        .pikmin-spot-desc { font-size: 0.9rem; color: #8a817c; text-align: center; margin-bottom: 4px; }
+        
+        .pikmin-dist-badge {
+            align-self: center; background: #fff0f3; color: #ff4d6d;
+            font-weight: 700; font-size: 0.82rem; padding: 5px 14px; border-radius: 20px;
+            border: 1px solid #ffccd5;
+        }
+
+        /* 答題卡 */
+        .quiz-container {
+            background: #faf8f5; border-radius: 20px; padding: 16px;
+            border: 1.5px dashed #ffd3b6; margin-top: 6px;
+        }
+
+        .quiz-q-title { font-size: 0.95rem; font-weight: 800; color: #5c544d; margin-bottom: 12px; line-height: 1.4; text-align: center; }
+        .quiz-options-group { display: flex; flex-direction: column; gap: 10px; }
+
+        .quiz-opt-btn {
+            width: 100%; padding: 14px 18px; border-radius: 18px;
+            border: 2px solid #ffccd5; background: #ffffff; color: #4a4e69;
+            font-size: 0.95rem; font-weight: 700; cursor: pointer;
+            transition: all 0.15s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            text-align: center;
+        }
+
+        .quiz-opt-btn:active { transform: scale(0.97); background: #ffe6ea; }
+
+        .quiz-opt-btn.disabled {
+            opacity: 0.6; cursor: not-allowed; background: #f0f0f0; border-color: #ddd;
+        }
+
+        .collected-tag {
+            background: #e8f5e9; color: #2e7d32; padding: 16px; border-radius: 20px;
+            font-weight: 800; text-align: center; font-size: 1rem; border: 1px solid #a5d6a7;
+        }
+
+        /* 通用彈窗與 Toast */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); z-index: 2000;
+            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); z-index: 3500;
             justify-content: center; align-items: center;
         }
 
@@ -307,15 +272,14 @@
 
         .toast {
             position: absolute; top: 85px; left: 50%; transform: translateX(-50%);
-            z-index: 1500; background: rgba(60, 60, 60, 0.85); color: white;
-            padding: 8px 18px; border-radius: 20px; font-size: 0.85rem; display: none;
-            backdrop-filter: blur(4px);
+            z-index: 4000; background: rgba(40, 40, 40, 0.9); color: white;
+            padding: 10px 20px; border-radius: 20px; font-size: 0.88rem; display: none;
+            backdrop-filter: blur(4px); font-weight: 700; box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }
     </style>
 </head>
 <body>
 
-    <!-- 🎵 背景音樂標籤 (自動循環播放) -->
     <audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
 
     <!-- 🔒 滿版登入遮罩 -->
@@ -327,8 +291,6 @@
         
         <div class="login-content">
             <button class="full-line-btn" onclick="loginWithLine()">使用 LINE 帳號登入</button>
-            
-            <!-- ⚠️ 測試專用：跳過登入按鈕 (正式上線前刪除此段) -->
             <button class="test-skip-btn" onclick="skipLoginForTesting()">⚡ 測試模式（跳過登入）</button>
         </div>
     </div>
@@ -337,7 +299,6 @@
 
     <div class="hud-top">
         <div class="brand-container">
-            <!-- 🌸 標題改為動態顯示：🌸 xxx 冒險家 -->
             <div class="brand-title" id="brand-title">🌸 驗證中... 冒險家</div>
             <div class="road-name" id="road-name">📍 定位中...</div>
         </div>
@@ -356,6 +317,26 @@
         </div>
     </div>
 
+    <!-- 🍄 皮克敏風格景點視窗 -->
+    <div class="pikmin-overlay" id="pikmin-modal" onclick="closePikminModal(event)">
+        <div class="pikmin-card" onclick="event.stopPropagation()">
+            <div class="pikmin-top-stage">
+                <button class="pikmin-close-btn" onclick="closePikminModal()">✕</button>
+                <img id="pikmin-coin-img" src="" alt="Spot Coin" class="pikmin-coin-display">
+            </div>
+            
+            <div class="pikmin-bottom-sheet">
+                <div class="pikmin-spot-title" id="pikmin-spot-title">景點名稱</div>
+                <div class="pikmin-spot-desc" id="pikmin-spot-desc">景點簡介說明</div>
+                <div class="pikmin-dist-badge" id="pikmin-dist-badge">📍 計算距離中...</div>
+                
+                <div class="quiz-container" id="quiz-container">
+                    <!-- 動態渲染問答題區塊 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast"></div>
 
     <div class="modal" id="win-modal">
@@ -368,7 +349,6 @@
     </div>
 
     <script>
-        // ⚙️ 設定區
         const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbx-ZuM0QX6rncNxsUcBct7CIcK89UVhgn3KOsJiPRug4NIFzTzX3LdtCUgd-546oRSJSQ/exec';
         const LINE_CHANNEL_ID = '2011007742';
 
@@ -376,16 +356,45 @@
         let currentName = null;
         let isBgmPlaying = false;
         let lastGeocodeCoords = null;
+        let activeSpot = null;
 
-        // 🟡 景點資料庫（各自指定獨立金幣圖片）
+        // 🟡 景點資料庫與問答庫（選項預設包含正確解答標記，每次開啟隨機排序）
         const spots = [
-            { id: 1, name: '奇美博物館', lat: 22.9348, lng: 120.2260, desc: '西洋藝術與古典城堡建築', icon: 'coin_chimei.png', collected: false },
-            { id: 2, name: '科工館', lat: 22.6405, lng: 120.3228, desc: '充滿驚奇與科幻的探索基地', icon: 'coin_science.png', collected: false },
-            { id: 3, name: '六合夜市', lat: 22.6331, lng: 120.3002, desc: '飄香數十年的經典高雄美食地標', icon: 'coin_liuhe.png', collected: false },
-            { id: 4, name: '新崛江', lat: 22.6222, lng: 120.3015, desc: '潮流與時尚聚集的青藝天地', icon: 'coin_shinkuchan.png', collected: false },
-            { id: 5, name: '駁二特區', lat: 22.6198, lng: 120.2818, desc: '港區倉庫改建的文創冒險樂園', icon: 'coin_pier2.png', collected: false },
-            { id: 6, name: '哈瑪星', lat: 22.6215, lng: 120.2710, desc: '大片草地與舊鐵道的港灣時光', icon: 'coin_hamasen.png', collected: false },
-            { id: 7, name: 'SKM Park', lat: 22.5815, lng: 120.3300, desc: '美式樂園風的購物與遊樂天堂', icon: 'coin_skmpark.png', collected: false }
+            { 
+                id: 1, name: '奇美博物館', lat: 22.9348, lng: 120.2260, desc: '西洋藝術與古典城堡建築', icon: 'coin_chimei.png', collected: false,
+                q: '奇美博物館最具代表性的建築風格接近哪一種？',
+                options: [{ text: '歐洲古典風格', isCorrect: true }, { text: '日式和風建築', isCorrect: false }]
+            },
+            { 
+                id: 2, name: '科工館', lat: 22.6405, lng: 120.3228, desc: '充滿驚奇與科幻的探索基地', icon: 'coin_science.png', collected: false,
+                q: '科工館的全名是？',
+                options: [{ text: '國立科學工藝博物館', isCorrect: true }, { text: '國立自然科學博物館', isCorrect: false }]
+            },
+            { 
+                id: 3, name: '六合夜市', lat: 22.6331, lng: 120.3002, desc: '飄香數十年的經典高雄美食地標', icon: 'coin_liuhe.png', collected: false,
+                q: '六合夜市最熱鬧的時段通常是？',
+                options: [{ text: '晚上', isCorrect: true }, { text: '清晨', isCorrect: false }]
+            },
+            { 
+                id: 4, name: '新崛江', lat: 22.6222, lng: 120.3015, desc: '潮流與時尚聚集的青藝天地', icon: 'coin_shinkuchan.png', collected: false,
+                q: '新崛江最有名的是哪一類型活動？',
+                options: [{ text: '潮流購物與美食', isCorrect: true }, { text: '登山健行', isCorrect: false }]
+            },
+            { 
+                id: 5, name: '駁二特區', lat: 22.6198, lng: 120.2818, desc: '港區倉庫改建的文創冒險樂園', icon: 'coin_pier2.png', collected: false,
+                q: '駁二藝術特區原本是什麼用途？',
+                options: [{ text: '港口倉庫', isCorrect: true }, { text: '火車車站', isCorrect: false }]
+            },
+            { 
+                id: 6, name: '哈瑪星', lat: 22.6215, lng: 120.2710, desc: '大片草地與舊鐵道的港灣時光', icon: 'coin_hamasen.png', collected: false,
+                q: '哈瑪星名稱的由來與哪一項有關？',
+                options: [{ text: '日文「濱線」鐵道', isCorrect: true }, { text: '哈瑪星天文台', isCorrect: false }]
+            },
+            { 
+                id: 7, name: 'SKM Park', lat: 22.5815, lng: 120.3300, desc: '美式樂園風的購物與遊樂天堂', icon: 'coin_skmpark.png', collected: false,
+                q: 'SKM Park 最大特色之一是？',
+                options: [{ text: '鈴鹿賽道樂園', isCorrect: true }, { text: '海洋水族館', isCorrect: false }]
+            }
         ];
 
         let userCoords = [22.6250, 120.3000];
@@ -393,40 +402,25 @@
         let totalDistanceMeters = 0;
         let previousPosition = null;
 
-        // 🎵 背景音樂控制功能（音量調小至 8%）
         function startBGM() {
             const bgm = document.getElementById('bgm');
             const btn = document.getElementById('bgm-btn');
             bgm.volume = 0.08; 
-            
             bgm.play().then(() => {
-                isBgmPlaying = true;
-                btn.innerText = '🎵';
-            }).catch(err => {
-                console.log('等待使用者手動點擊觸發音樂');
-            });
+                isBgmPlaying = true; btn.innerText = '🎵';
+            }).catch(() => {});
         }
 
         function toggleBGM() {
             const bgm = document.getElementById('bgm');
             const btn = document.getElementById('bgm-btn');
-            
-            if (isBgmPlaying) {
-                bgm.pause();
-                btn.innerText = '🔇';
-            } else {
-                bgm.volume = 0.08;
-                bgm.play();
-                btn.innerText = '🎵';
-            }
+            if (isBgmPlaying) { bgm.pause(); btn.innerText = '🔇'; }
+            else { bgm.volume = 0.08; bgm.play(); btn.innerText = '🎵'; }
             isBgmPlaying = !isBgmPlaying;
         }
 
-        // 🗺️ 即時逆地理編碼：解析「縣市 + 鄉鎮區 + 路名」
         function fetchRoadName(lat, lng) {
-            if (lastGeocodeCoords && getDistance(lastGeocodeCoords[0], lastGeocodeCoords[1], lat, lng) < 30) {
-                return;
-            }
+            if (lastGeocodeCoords && getDistance(lastGeocodeCoords[0], lastGeocodeCoords[1], lat, lng) < 30) return;
             lastGeocodeCoords = [lat, lng];
 
             fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=zh-TW`)
@@ -437,14 +431,10 @@
                         const city = addr.city || addr.county || addr.state || '';
                         const district = addr.suburb || addr.town || addr.district || addr.city_district || addr.village || '';
                         const road = addr.road || addr.pedestrian || addr.street || addr.neighbourhood || '';
-                        
                         const fullAddress = [city, district, road].filter(Boolean).join(' ');
                         document.getElementById('road-name').innerText = fullAddress ? `📍 ${fullAddress}` : '📍 高雄探索中';
                     }
-                })
-                .catch(() => {
-                    document.getElementById('road-name').innerText = `📍 搜尋路名中...`;
-                });
+                }).catch(() => { document.getElementById('road-name').innerText = `📍 搜尋路名中...`; });
         }
 
         function initMap() {
@@ -467,19 +457,99 @@
             });
             playerMarker = L.marker(userCoords, { icon: playerIcon }).addTo(map);
 
-            // 🪙 繪製專屬金幣標記
+            // 🪙 金幣點擊事件绑定
             spots.forEach(spot => {
                 const icon = L.divIcon({
                     className: 'coin-icon-wrapper', 
                     html: `<img src="${spot.icon}" class="coin-icon-img" alt="${spot.name}">`,
-                    iconSize: [36, 36], 
-                    iconAnchor: [18, 18]
+                    iconSize: [38, 38], iconAnchor: [19, 19]
                 });
                 const marker = L.marker([spot.lat, spot.lng], { icon: icon }).addTo(map);
-                marker.bindPopup(`<b>${spot.name}</b><br>${spot.desc}`);
+                marker.on('click', () => openPikminModal(spot));
             });
 
             checkUrlParamsAndInit();
+        }
+
+        /* 🍄 開啟皮克敏風格頁面 */
+        function openPikminModal(spot) {
+            activeSpot = spot;
+            document.getElementById('pikmin-coin-img').src = spot.icon;
+            document.getElementById('pikmin-spot-title').innerText = spot.name;
+            document.getElementById('pikmin-spot-desc').innerText = spot.desc;
+            
+            renderPikminQuiz();
+            document.getElementById('pikmin-modal').style.display = 'flex';
+        }
+
+        function closePikminModal(e) {
+            if (e && e.target !== e.currentTarget && !e.target.classList.contains('pikmin-close-btn')) return;
+            document.getElementById('pikmin-modal').style.display = 'none';
+            activeSpot = null;
+        }
+
+        /* 渲染皮克敏問答內容 */
+        function renderPikminQuiz() {
+            if (!activeSpot) return;
+
+            const dist = getDistance(userCoords[0], userCoords[1], activeSpot.lat, activeSpot.lng);
+            const badge = document.getElementById('pikmin-dist-badge');
+            const container = document.getElementById('quiz-container');
+
+            badge.innerText = dist > 1000 ? `📍 距離 ${(dist/1000).toFixed(1)} km` : `📍 距離 ${dist} m`;
+
+            // 已收集狀態
+            if (activeSpot.collected) {
+                container.innerHTML = `<div class="collected-tag">✨ 已成功回答並領取金幣！</div>`;
+                return;
+            }
+
+            // 打亂選項順序（不標註 A/B）
+            const shuffledOptions = [...activeSpot.options].sort(() => Math.random() - 0.5);
+
+            if (dist <= 50) {
+                container.innerHTML = `
+                    <div class="quiz-q-title">❓ ${activeSpot.q}</div>
+                    <div class="quiz-options-group">
+                        ${shuffledOptions.map(opt => `
+                            <button class="quiz-opt-btn" onclick="submitAnswer(${opt.isCorrect})">${opt.text}</button>
+                        `).join('')}
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="quiz-q-title">❓ ${activeSpot.q}</div>
+                    <div class="quiz-options-group">
+                        ${shuffledOptions.map(opt => `
+                            <button class="quiz-opt-btn disabled" disabled>${opt.text}</button>
+                        `).join('')}
+                    </div>
+                    <div style="color: #ff4d6d; font-size: 0.8rem; font-weight: 700; text-align: center; margin-top: 10px;">
+                        🚶 請靠近至 50 公尺內（目前 ${dist}m）才能答題領取金幣！
+                    </div>
+                `;
+            }
+        }
+
+        /* 答題驗證 */
+        function submitAnswer(isCorrect) {
+            if (!activeSpot) return;
+
+            const dist = getDistance(userCoords[0], userCoords[1], activeSpot.lat, activeSpot.lng);
+            if (dist > 50) {
+                showToast('🚶 您距離太遠囉！請靠近至 50m 內再試！');
+                return;
+            }
+
+            if (isCorrect) {
+                activeSpot.collected = true;
+                showToast(`🎉 答對了！成功領取 ${activeSpot.name} 金幣！`);
+                syncDataToGAS();
+                updateProgressUI();
+                renderPikminQuiz();
+            } else {
+                showToast('❌ 答錯囉，再想看看！');
+            }
         }
 
         function loginWithLine() {
@@ -489,7 +559,6 @@
             window.location.href = lineAuthUrl;
         }
 
-        /* ⚠️ 測試專用：跳過登入函式 (正式上線前刪除此段) */
         function skipLoginForTesting() {
             startBGM();
             document.getElementById('login-overlay').style.display = 'none';
@@ -505,10 +574,8 @@
 
         function checkUrlParamsAndInit() {
             const params = new URLSearchParams(window.location.search);
-            
             if (params.has('line_id')) {
                 document.getElementById('login-overlay').style.display = 'none';
-
                 currentLineId = params.get('line_id');
                 currentName = params.get('name') || '冒險家';
                 const savedDist = parseFloat(params.get('dist') || '0');
@@ -533,10 +600,8 @@
 
         function syncDataToGAS() {
             if (!currentLineId || currentLineId === 'test_guest') return;
-
             const collectedSpotIds = spots.filter(s => s.collected).map(s => s.id).join(',');
             const km = (totalDistanceMeters / 1000).toFixed(2);
-
             const url = `${GAS_API_URL}?action=updateData&line_id=${encodeURIComponent(currentLineId)}&dist=${km}&spots=${encodeURIComponent(collectedSpotIds)}`;
             fetch(url, { mode: 'no-cors' });
         }
@@ -550,6 +615,7 @@
         }
 
         function updatePlayerPosition(coords) {
+            userCoords = coords;
             if (previousPosition) {
                 const moved = getDistance(previousPosition[0], previousPosition[1], coords[0], coords[1]);
                 if (moved >= 3) {
@@ -559,10 +625,9 @@
                 }
             } else {
                 previousPosition = coords;
-                map.panTo(coords); // 💡 首次取得 GPS 定位時自動將地圖對焦至玩家位置
+                map.panTo(coords);
             }
 
-            // 更新「縣市 + 鄉鎮區 + 路名」
             fetchRoadName(coords[0], coords[1]);
 
             const walkedEl = document.getElementById('total-walked');
@@ -573,11 +638,6 @@
             let nearest = null, minDist = Infinity;
             spots.forEach(spot => {
                 const dist = getDistance(coords[0], coords[1], spot.lat, spot.lng);
-                if (dist <= 50 && !spot.collected) {
-                    spot.collected = true;
-                    showToast(`✨ 解鎖成功：${spot.name}！`);
-                    syncDataToGAS();
-                }
                 if (dist < minDist) { minDist = dist; nearest = spot; }
             });
 
@@ -585,6 +645,12 @@
                 document.getElementById('target-name').innerHTML = `<img src="${nearest.icon}" class="hud-coin-img" alt="${nearest.name}"> ${nearest.name}`;
                 document.getElementById('target-dist').innerText = minDist > 1000 ? `${(minDist / 1000).toFixed(1)} km` : `${minDist} m`;
             }
+
+            // 如果皮克敏視窗開著，動態更新距離與按鈕狀態
+            if (activeSpot) {
+                renderPikminQuiz();
+            }
+
             updateProgressUI();
         }
 
