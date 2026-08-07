@@ -1,567 +1,417 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>皮克敏高雄奇幻探險地圖</title>
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      user-select: none;
-      -webkit-user-select: none;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TAKAO WALK arr! - 馬卡龍水彩探險地圖</title>
+    
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    body, html {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background-color: #e8f5e9;
-    }
+    <!-- MapTiler SDK & Leaflet Plugin CDN -->
+    <link href="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.0/maptiler-sdk.css" rel="stylesheet" />
+    <script src="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.0/maptiler-sdk.umd.js"></script>
+    <script src="https://cdn.maptiler.com/leaflet-maptilersdk/v2.0.0/leaflet-maptilersdk.js"></script>
 
-    #map {
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-    }
+    <style>
+        :root {
+            --pastel-bg: #fffcf5;
+            --pastel-card: rgba(255, 255, 255, 0.92);
+            --pastel-pink: #ffb7c5;
+            --pastel-yellow: #ffd3b6;
+            --text-color: #5c544d;
+        }
 
-    /* 頂部 HUD 狀態列 */
-    .hud-header {
-      position: absolute;
-      top: 16px;
-      left: 16px;
-      right: 16px;
-      z-index: 1000;
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      padding: 12px 16px;
-      border-radius: 20px;
-      box-shadow: 0 8px 24px rgba(46, 125, 50, 0.15);
-      border: 2px solid rgba(139, 195, 74, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    .hud-title {
-      font-size: 15px;
-      font-weight: 800;
-      color: #2e7d32;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--pastel-bg);
+            color: var(--text-color);
+        }
 
-    .radar-status {
-      font-size: 11px;
-      color: #558b2f;
-      margin-top: 2px;
-      font-weight: 600;
-    }
+        #map {
+            width: 100%;
+            height: 100vh;
+            z-index: 1;
+        }
 
-    .hud-badge {
-      background: #8bc34a;
-      color: white;
-      padding: 6px 12px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 700;
-      box-shadow: 0 2px 8px rgba(139, 195, 74, 0.4);
-    }
+        .hud-top {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            width: 90%;
+            max-width: 420px;
+            background: var(--pastel-card);
+            backdrop-filter: blur(8px);
+            padding: 12px 18px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(180, 160, 150, 0.15);
+            border: 2px solid #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    /* 底部控制面板 */
-    .hud-controls {
-      position: absolute;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1000;
-      display: flex;
-      gap: 12px;
-      width: calc(100% - 32px);
-      max-width: 400px;
-    }
+        .brand-title {
+            font-weight: 800;
+            font-size: 1.05rem;
+            color: #ff758c;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
 
-    .hud-btn {
-      flex: 1;
-      background: #7cb34a;
-      color: white;
-      border: none;
-      padding: 14px;
-      border-radius: 18px;
-      font-size: 14px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      box-shadow: 0 6px 20px rgba(124, 179, 66, 0.35);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: 2px solid #aed581;
-    }
+        .radar-status {
+            font-size: 0.8rem;
+            background: #f0f3f8;
+            padding: 4px 10px;
+            border-radius: 12px;
+            color: #6c757d;
+            font-weight: 600;
+        }
 
-    .hud-btn:active {
-      transform: scale(0.96);
-      background: #689f38;
-    }
+        .hud-bottom {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            width: 90%;
+            max-width: 420px;
+            background: var(--pastel-card);
+            backdrop-filter: blur(8px);
+            padding: 16px;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(180, 160, 150, 0.18);
+            border: 2px solid #ffffff;
+            text-align: center;
+        }
 
-    .hud-btn.secondary {
-      background: #ffffff;
-      color: #33691e;
-      border: 2px solid #c5e1a5;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    }
+        .target-title {
+            font-size: 0.85rem;
+            color: #8a817c;
+            margin-bottom: 4px;
+        }
 
-    /* 彈窗 Popup 樣式 */
-    .leaflet-popup-content-wrapper {
-      border-radius: 18px;
-      padding: 4px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-      border: 3px solid #8bc34a;
-    }
+        .target-name {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #4a4e69;
+            margin-bottom: 6px;
+        }
 
-    .spot-popup {
-      text-align: center;
-      padding: 8px;
-    }
+        .target-dist {
+            font-size: 0.95rem;
+            color: #ff7f50;
+            font-weight: 700;
+        }
 
-    .spot-popup h4 {
-      color: #2e7d32;
-      font-size: 16px;
-      margin-bottom: 4px;
-    }
+        .progress-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
 
-    .spot-popup p {
-      color: #666;
-      font-size: 12px;
-      margin-bottom: 10px;
-    }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--pastel-pink), var(--pastel-yellow));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
 
-    .collect-btn {
-      background: #8bc34a;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 12px;
-      font-weight: bold;
-      font-size: 13px;
-      width: 100%;
-      cursor: pointer;
-    }
+        .custom-icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+        }
 
-    .collect-btn:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
+        .player-avatar {
+            width: 24px;
+            height: 24px;
+            background-color: #3a86ff;
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 0 12px rgba(58, 134, 255, 0.6);
+            animation: pulse 1.8s infinite;
+        }
 
-    /* Toast 通知 */
-    #toast {
-      position: absolute;
-      top: 80px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-20px);
-      background: rgba(33, 33, 33, 0.88);
-      color: white;
-      padding: 10px 20px;
-      border-radius: 25px;
-      font-size: 13px;
-      font-weight: 600;
-      z-index: 2000;
-      opacity: 0;
-      pointer-events: none;
-      transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-      white-space: nowrap;
-    }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(58, 134, 255, 0.6); }
+            70% { box-shadow: 0 0 0 14px rgba(58, 134, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(58, 134, 255, 0); }
+        }
 
-    #toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
 
-    /* 定位點脈衝動畫 */
-    .user-location-marker {
-      position: relative;
-    }
+        .modal-content {
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 28px;
+            width: 85%;
+            max-width: 360px;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
 
-    .pulse-dot {
-      width: 18px;
-      height: 18px;
-      background: #29b6f6;
-      border: 3px solid white;
-      border-radius: 50%;
-      box-shadow: 0 0 10px rgba(41, 182, 246, 0.8);
-    }
+        .modal-btn {
+            margin-top: 16px;
+            padding: 10px 24px;
+            background: var(--pastel-pink);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
 
-    .pulse-ring {
-      position: absolute;
-      top: -9px;
-      left: -9px;
-      width: 36px;
-      height: 36px;
-      border: 3px solid #29b6f6;
-      border-radius: 50%;
-      animation: pulsate 1.8s infinite ease-out;
-      opacity: 0;
-    }
-
-    @keyframes pulsate {
-      0% { transform: scale(0.3); opacity: 0.9; }
-      100% { transform: scale(1.6); opacity: 0; }
-    }
-  </style>
+        .toast {
+            position: absolute;
+            top: 85px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1500;
+            background: rgba(60, 60, 60, 0.85);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: none;
+            backdrop-filter: blur(4px);
+        }
+    </style>
 </head>
 <body>
 
-  <!-- Toast 通知區 -->
-  <div id="toast"></div>
+    <div id="map"></div>
 
-  <!-- 完成通關 Modal 彈窗 -->
-  <div id="victory-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:3000; align-items:center; justify-content:center; padding:20px;">
-    <div style="background:#f1f8e9; border:4px solid #7cb342; border-radius:24px; padding:24px; text-align:center; max-width:340px; width:100%; box-shadow:0 12px 32px rgba(0,0,0,0.3);">
-      <div style="font-size:48px; margin-bottom:12px;">🎉</div>
-      <h2 style="color:#2e7d32; margin:0 0 10px 0; font-size:20px; font-weight:800;">探險隊任務完成！</h2>
-      <p style="color:#558b2f; font-size:14px; line-height:1.5; margin-bottom:20px;">太棒了！你已經順利採集並收集完全高雄 7 大皮克敏寶物與花苗！</p>
-      <button onclick="closeVictoryModal()" style="background:#8bc34a; color:white; border:none; padding:12px 24px; border-radius:18px; font-weight:bold; font-size:15px; width:100%; cursor:pointer;">太好了！繼續探索</button>
+    <div class="hud-top">
+        <div class="brand-title">🌸 TAKAO WALK arr!</div>
+        <div class="radar-status" id="radar-status">📡 定位初始化...</div>
     </div>
-  </div>
 
-  <!-- iOS 定位排錯引導 Modal -->
-  <div id="ios-guide-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:3000; align-items:center; justify-content:center; padding:20px;">
-    <div style="background:#ffffff; border:3px solid #ff9800; border-radius:24px; padding:20px; max-width:340px; width:100%; box-shadow:0 12px 32px rgba(0,0,0,0.3);">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <h3 style="color:#e65100; margin:0; font-size:17px; font-weight:800;">📱 iOS 定位解法指南</h3>
-        <span onclick="closeIosGuide()" style="cursor:pointer; font-size:20px; color:#999; font-weight:bold;">✕</span>
-      </div>
-      <div style="font-size:13px; color:#444; line-height:1.6; text-align:left; background:#fff3e0; padding:12px; border-radius:12px; margin-bottom:14px;">
-        <b>1. 使用 Safari 開啟：</b>若在 LINE/FB 內，請點選右上角「以 Safari 開啟」。<br>
-        <b>2. 開啟 iOS 定位：</b>「設定」>「隱私權與安全性」>「定位服務」確定已開啟。<br>
-        <b>3. Safari 網站權限：</b>在 Safari 網址列左側點擊「AA」或設定圖示 >「網站設定」>「位置」改為「允許」。<br>
-        <b>4. 網址必須為 HTTPS：</b>iOS 要求定位服務必須於安全連線 (HTTPS) 下運行。
-      </div>
-      <button onclick="closeIosGuide()" style="background:#ff9800; color:white; border:none; padding:10px; border-radius:16px; font-weight:bold; width:100%; cursor:pointer;">我知道了</button>
+    <div class="hud-bottom">
+        <div class="target-title">距離最近的冒險點</div>
+        <div class="target-name" id="target-name">搜尋中...</div>
+        <div class="target-dist" id="target-dist">-- m</div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progress-fill"></div>
+        </div>
     </div>
-  </div>
 
-  <!-- 頂部 HUD 狀態列 -->
-  <div class="hud-header">
-    <div>
-      <div class="hud-title">🌱 皮克敏探險隊 <span onclick="showIosGuide()" style="font-size:12px; background:#fff3e0; color:#e65100; padding:2px 8px; border-radius:10px; cursor:pointer; margin-left:4px;">❓ iOS說明</span></div>
-      <div class="radar-status" id="radar-status">📡 定位中...</div>
+    <div class="toast" id="toast"></div>
+
+    <div class="modal" id="win-modal">
+        <div class="modal-content">
+            <div style="font-size: 3rem; margin-bottom: 8px;">🎉</div>
+            <h2 style="color: #ff758c; margin-bottom: 8px;">任務完成！</h2>
+            <p style="color: #6c757d; font-size: 0.9rem; line-height: 1.5;">你已踏遍 TAKAO WALK arr! 所有馬卡龍景點！</p>
+            <button class="modal-btn" onclick="closeModal('win-modal')">太棒了！</button>
+        </div>
     </div>
-    <div class="hud-badge">🎒 寶物: <span id="collected-count">0</span>/7</div>
-  </div>
 
-  <!-- 地圖容器 -->
-  <div id="map"></div>
+    <script>
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
 
-  <!-- 底部控制按鈕區 -->
-  <div class="hud-controls">
-    <button class="hud-btn" onclick="updateLocation(true)">
-      <span>📡</span> 哨子呼喚 (定位)
-    </button>
-    <button class="hud-btn secondary" onclick="toggleDemoMode()">
-      <span>🎮</span> <span id="demo-btn-text">試玩模式</span>
-    </button>
-  </div>
+        function playSound(type) {
+            if (!audioCtx) audioCtx = new AudioCtx();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    let map, userMarker;
-    let collectedCount = 0;
-    let userCoords = [22.6273, 120.3014]; // 預設高雄中心點
-    let isDemoMode = false;
-    let audioCtx = null;
-    let watchId = null;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
 
-    // 高雄 7 大皮克敏景點資料
-    const pikminSpots = [
-      { id: 1, name: "愛河水岸", type: "紅皮克敏花苗", coords: [22.6273, 120.3014], icon: "🌱", collected: false },
-      { id: 2, name: "駁二藝術特區", type: "巨型草莓", coords: [22.6201, 120.2818], icon: "🍓", collected: false },
-      { id: 3, name: "高雄流行音樂中心", type: "金色齒輪", coords: [22.6186, 120.2931], icon: "⚙️", collected: false },
-      { id: 4, name: "旗津天后宮", type: "紅番茄寶物", coords: [22.6139, 120.2682], icon: "🍅", collected: false },
-      { id: 5, name: "蓮池潭龍虎塔", type: "青蘋果寶物", coords: [22.6806, 120.2982], icon: "🍏", collected: false },
-      { id: 6, name: "澄清湖風景區", type: "黃皮克敏花苗", coords: [22.6586, 120.3553], icon: "🌼", collected: false },
-      { id: 7, name: "高雄車站", type: "紫皮克敏大花苗", coords: [22.6397, 120.3023], icon: "🟣", collected: false }
-    ];
-
-    // 🔊 Web Audio 初始化與解鎖
-    function initAudio() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-    }
-
-    window.addEventListener('touchstart', initAudio, { once: true });
-    window.addEventListener('click', initAudio, { once: true });
-
-    // 哨子音效
-    function playWhistleSound() {
-      initAudio();
-      if (!audioCtx) return;
-      try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(1600, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(2200, audioCtx.currentTime + 0.15);
-        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.3);
-      } catch(e) { console.log(e); }
-    }
-
-    // 採集音效
-    function playCollectSound() {
-      initAudio();
-      if (!audioCtx) return;
-      try {
-        const notes = [523.25, 659.25, 783.99, 1046.50];
-        notes.forEach((freq, index) => {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.value = freq;
-          const startTime = audioCtx.currentTime + (index * 0.08);
-          gain.gain.setValueAtTime(0.2, startTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.2);
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.start(startTime);
-          osc.stop(startTime + 0.2);
-        });
-      } catch(e) { console.log(e); }
-    }
-
-    // 地圖初始化
-    function initMap() {
-      map = L.map('map', { zoomControl: false }).setView(userCoords, 13);
-
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-      }).addTo(map);
-
-      renderSpotMarkers();
-      updatePlayerMarker(userCoords);
-
-      // 試玩模式點擊事件
-      map.on('click', (e) => {
-        if (isDemoMode) {
-          userCoords = [e.latlng.lat, e.latlng.lng];
-          updatePlayerMarker(userCoords);
-          findNearestSpot(e.latlng.lat, e.latlng.lng);
-          playWhistleSound();
-        }
-      });
-
-      updateLocation();
-    }
-
-    // 繪製景點地標
-    function renderSpotMarkers() {
-      pikminSpots.forEach(spot => {
-        const customIcon = L.divIcon({
-          className: 'custom-spot-icon',
-          html: `<div id="spot-icon-${spot.id}" style="font-size: 28px; text-shadow: 0 4px 8px rgba(0,0,0,0.3); transition: all 0.3s;">${spot.icon}</div>`,
-          iconSize: [30, 30],
-          iconAnchor: [15, 15]
-        });
-
-        const popupContent = `
-          <div class="spot-popup">
-            <h4>${spot.name}</h4>
-            <p>發現物：${spot.type}</p>
-            <button id="pop-btn-${spot.id}" class="collect-btn" onclick="collectTreasure(${spot.id})">
-              ${spot.collected ? '✅ 已採集完成' : '派遣皮克敏採集'}
-            </button>
-          </div>
-        `;
-
-        const marker = L.marker(spot.coords, { icon: customIcon }).addTo(map);
-        marker.bindPopup(popupContent);
-      });
-    }
-
-    // 更新玩家圖標
-    function updatePlayerMarker(coords) {
-      if (userMarker) {
-        userMarker.setLatLng(coords);
-      } else {
-        const playerIcon = L.divIcon({
-          className: 'user-location-marker',
-          html: `<div class="pulse-ring"></div><div class="pulse-dot"></div>`,
-          iconSize: [20, 20],
-          iconAnchor: [10, 10]
-        });
-        userMarker = L.marker(coords, { icon: playerIcon }).addTo(map);
-      }
-    }
-
-    // 尋找最近景點與計算距離
-    function findNearestSpot(lat, lng) {
-      let minDistance = Infinity;
-      let nearestSpot = null;
-
-      pikminSpots.forEach(spot => {
-        const dist = map.distance([lat, lng], spot.coords);
-        if (dist < minDistance) {
-          minDistance = dist;
-          nearestSpot = spot;
-        }
-      });
-
-      const distText = minDistance > 1000 ? `${(minDistance/1000).toFixed(1)} km` : `${Math.round(minDistance)} m`;
-      document.getElementById('radar-status').innerText = `📡 最近目標：${nearestSpot.name} (${distText})`;
-    }
-
-    // 📡 抓取 GPS 定位
-    function updateLocation(isUserClick = false) {
-      if (isDemoMode) {
-        showToast("🎮 目前為試玩模式！可以直接點擊地圖任意處移動。");
-        return;
-      }
-
-      if (!navigator.geolocation) {
-        showToast("⚠️ 您的裝置或瀏覽器不支援 GPS 功能。");
-        showIosGuide();
-        return;
-      }
-
-      // 檢測是否在 LINE / FB 內建瀏覽器
-      const ua = navigator.userAgent || navigator.vendor || window.opera;
-      const isLineOrFB = (ua.indexOf("LINE") > -1) || (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1);
-      if (isLineOrFB) {
-        showToast("💡 iOS 請點擊右上角「...」，選擇「在 Safari 開啟」才能順利定位喔！");
-      }
-
-      document.getElementById('radar-status').innerText = "📡 探險隊雷達定位中...";
-
-      const primaryOptions = { enableHighAccuracy: true, timeout: 8000, maximumAge: 10000 };
-      const fallbackOptions = { enableHighAccuracy: false, timeout: 12000, maximumAge: 30000 };
-
-      const handleSuccess = (pos) => {
-        userCoords = [pos.coords.latitude, pos.coords.longitude];
-        updatePlayerMarker(userCoords);
-        map.setView(userCoords, 14);
-        findNearestSpot(userCoords[0], userCoords[1]);
-        
-        if (isUserClick) {
-          playWhistleSound();
-          showToast("✨ 雷達已定位到您的實體位置！");
-        }
-      };
-
-      const handleError = (err) => {
-        navigator.geolocation.getCurrentPosition(
-          handleSuccess,
-          (finalErr) => {
-            let errorMsg = "⚠️ 定位失敗，已切換預設區域。可點選「試玩模式」點擊移動！";
-            if (finalErr.code === 1) {
-              errorMsg = "⚠️ 定位權限被拒絕。請開啟 Safari 定位權限或點擊右上角「iOS說明」。";
+            if (type === 'whistle') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(2200, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
+            } else if (type === 'collect') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
             }
-            document.getElementById('radar-status').innerText = "⚠️ 定位無回應 (建議切換試玩模式)";
-            if (isUserClick) {
-              showToast(errorMsg);
-              showIosGuide();
+        }
+
+        const spots = [
+            { id: 1, name: '奇美博物館', lat: 22.9348, lng: 120.2260, desc: '西洋藝術與古典城堡建築', icon: '🏛️', collected: false },
+            { id: 2, name: '科工館', lat: 22.6405, lng: 120.3228, desc: '充滿驚奇與科幻的探索基地', icon: '🔬', collected: false },
+            { id: 3, name: '六合夜市', lat: 22.6331, lng: 120.3002, desc: '飄香數十年的經典高雄美食地標', icon: '🍢', collected: false },
+            { id: 4, name: '新崛江', lat: 22.6222, lng: 120.3015, desc: '潮流與時尚聚集的青藝天地', icon: '🛍️', collected: false },
+            { id: 5, name: '駁二特區', lat: 22.6198, lng: 120.2818, desc: '港區倉庫改建的文創冒險樂園', icon: '🎨', collected: false },
+            { id: 6, name: '哈瑪星', lat: 22.6215, lng: 120.2710, desc: '大片草地與舊鐵道的港灣時光', icon: '🚂', collected: false },
+            { id: 7, name: 'SKM Park', lat: 22.5815, lng: 120.3300, desc: '美式樂園風的購物與遊樂天堂', icon: '🎡', collected: false }
+        ];
+
+        let userCoords = [22.6250, 120.3000];
+        let map, playerMarker;
+        let spotMarkers = {};
+
+        function initMap() {
+            map = L.map('map', {
+                zoomControl: false,
+                attributionControl: false
+            }).setView(userCoords, 13);
+
+            // 💡 使用你的 MapTiler Key 載入 Aquarelle 馬卡龍水彩風格
+            const mtLayer = new L.maptiler.MaptilerLayer({
+                apiKey: "DDhwtFjCbEWiteavezOK",
+                style: "aquarelle"
+            }).addTo(map);
+
+            const playerIcon = L.divIcon({
+                className: 'player-marker',
+                html: '<div class="player-avatar"></div>',
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+            });
+            playerMarker = L.marker(userCoords, { icon: playerIcon }).addTo(map);
+
+            spots.forEach(spot => {
+                const icon = L.divIcon({
+                    className: 'custom-icon',
+                    html: `<div>${spot.icon}</div>`,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
+                });
+
+                const marker = L.marker([spot.lat, spot.lng], { icon: icon }).addTo(map);
+                marker.bindPopup(`<b>${spot.name}</b><br>${spot.desc}`);
+                spotMarkers[spot.id] = marker;
+            });
+
+            map.on('click', (e) => {
+                userCoords = [e.latlng.lat, e.latlng.lng];
+                updatePlayerPosition(userCoords);
+                playSound('whistle');
+            });
+
+            startGeolocation();
+        }
+
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3;
+            const φ1 = lat1 * Math.PI / 180;
+            const φ2 = lat2 * Math.PI / 180;
+            const Δφ = (lat2 - lat1) * Math.PI / 180;
+            const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+            const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return Math.round(R * c);
+        }
+
+        function updatePlayerPosition(coords) {
+            playerMarker.setLatLng(coords);
+
+            let nearest = null;
+            let minDist = Infinity;
+            let collectedCount = 0;
+
+            spots.forEach(spot => {
+                const dist = getDistance(coords[0], coords[1], spot.lat, spot.lng);
+                if (dist <= 50 && !spot.collected) {
+                    spot.collected = true;
+                    playSound('collect');
+                    showToast(`✨ 解鎖成功：${spot.name}！`);
+                }
+
+                if (spot.collected) collectedCount++;
+
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearest = spot;
+                }
+            });
+
+            if (nearest) {
+                document.getElementById('target-name').innerText = `${nearest.icon} ${nearest.name}`;
+                document.getElementById('target-dist').innerText = minDist > 1000 ? `${(minDist / 1000).toFixed(1)} km` : `${minDist} m`;
             }
-            updatePlayerMarker(userCoords);
-            findNearestSpot(userCoords[0], userCoords[1]);
-          },
-          fallbackOptions
-        );
-      };
 
-      navigator.geolocation.getCurrentPosition(handleSuccess, handleError, primaryOptions);
+            const progressPercent = (collectedCount / spots.length) * 100;
+            document.getElementById('progress-fill').style.width = `${progressPercent}%`;
 
-      if (!watchId) {
-        watchId = navigator.geolocation.watchPosition(
-          (pos) => {
-            userCoords = [pos.coords.latitude, pos.coords.longitude];
-            updatePlayerMarker(userCoords);
-            findNearestSpot(userCoords[0], userCoords[1]);
-          },
-          (e) => {},
-          fallbackOptions
-        );
-      }
-    }
+            if (collectedCount === spots.length) {
+                document.getElementById('win-modal').style.display = 'flex';
+            }
+        }
 
-    // 🌱 採集寶物
-    function collectTreasure(spotId) {
-      const spot = pikminSpots.find(s => s.id === spotId);
-      if (!spot || spot.collected) return;
+        function startGeolocation() {
+            const statusEl = document.getElementById('radar-status');
 
-      spot.collected = true;
-      collectedCount++;
-      document.getElementById('collected-count').innerText = collectedCount;
+            if (!navigator.geolocation) {
+                statusEl.innerText = "⚠️ 瀏覽器不支援 GPS";
+                return;
+            }
 
-      playCollectSound();
-      showToast(`🎉 成功派遣皮克敏獲得：${spot.name}！`);
+            navigator.geolocation.watchPosition(
+                (pos) => {
+                    statusEl.innerText = "📡 雷達連線中";
+                    userCoords = [pos.coords.latitude, pos.coords.longitude];
+                    updatePlayerPosition(userCoords);
+                },
+                (err) => {
+                    statusEl.innerText = "💡 試玩模式 (點地圖移動)";
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        }
 
-      const btn = document.getElementById(`pop-btn-${spotId}`);
-      if (btn) {
-        btn.innerText = "✅ 已採集完成";
-        btn.style.background = "#8bc34a";
-        btn.disabled = true;
-      }
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
 
-      const iconElem = document.getElementById(`spot-icon-${spotId}`);
-      if (iconElem) {
-        iconElem.style.filter = "grayscale(80%)";
-        iconElem.style.opacity = "0.6";
-      }
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
 
-      if (collectedCount === 7) {
-        setTimeout(() => {
-          showVictoryModal();
-        }, 500);
-      }
-    }
-
-    // Modal 與 Toast 控制
-    function showVictoryModal() { document.getElementById('victory-modal').style.display = 'flex'; }
-    function closeVictoryModal() { document.getElementById('victory-modal').style.display = 'none'; }
-    function showIosGuide() { document.getElementById('ios-guide-modal').style.display = 'flex'; }
-    function closeIosGuide() { document.getElementById('ios-guide-modal').style.display = 'none'; }
-
-    // 🎮 切換試玩模式
-    function toggleDemoMode() {
-      isDemoMode = !isDemoMode;
-      const btnText = document.getElementById('demo-btn-text');
-      if (isDemoMode) {
-        btnText.innerText = "退出試玩";
-        showToast("🎮 已開啟試玩模式！請直接點擊地圖任意處移動。");
-        document.getElementById('radar-status').innerText = "🎮 試玩模式：點擊地圖移動";
-      } else {
-        btnText.innerText = "試玩模式";
-        showToast("📡 已切換回 GPS 定位模式");
-        updateLocation(true);
-      }
-    }
-
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.innerText = msg;
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 4000);
-    }
-
-    window.onload = initMap;
-  </script>
+        window.onload = initMap;
+    </script>
 </body>
 </html>
