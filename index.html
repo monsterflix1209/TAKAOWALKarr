@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TAKAO WALK arr! - 馬卡龍水彩探險地圖</title>
+    <title>TAKAO WALK arr!</title>
     
-    <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -40,6 +39,54 @@
             z-index: 1;
         }
 
+        /* 🔒 滿版強制登入遮罩 */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 252, 245, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .login-card {
+            background: #ffffff;
+            padding: 36px 28px;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(180, 160, 150, 0.25);
+            border: 2px solid #ffffff;
+            max-width: 340px;
+            width: 100%;
+        }
+
+        .full-line-btn {
+            width: 100%;
+            background-color: #06C755;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 6px 16px rgba(6, 199, 85, 0.3);
+            transition: transform 0.1s ease;
+        }
+
+        .full-line-btn:active {
+            transform: scale(0.98);
+        }
+
         .hud-top {
             position: absolute;
             top: 15px;
@@ -59,6 +106,12 @@
             align-items: center;
         }
 
+        .brand-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
         .brand-title {
             font-weight: 800;
             font-size: 1.05rem;
@@ -68,13 +121,22 @@
             gap: 6px;
         }
 
-        .radar-status {
-            font-size: 0.8rem;
-            background: #f0f3f8;
-            padding: 4px 10px;
-            border-radius: 12px;
-            color: #6c757d;
-            font-weight: 600;
+        .user-name {
+            font-size: 0.75rem;
+            color: #4a4e69;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        .dist-tracker {
+            font-size: 0.85rem;
+            background: #fff0f3;
+            padding: 6px 12px;
+            border-radius: 14px;
+            color: #ff4d6d;
+            font-weight: 800;
+            white-space: nowrap;
+            border: 1px solid #ffccd5;
         }
 
         .hud-bottom {
@@ -94,56 +156,29 @@
             text-align: center;
         }
 
-        .target-title {
-            font-size: 0.85rem;
-            color: #8a817c;
-            margin-bottom: 4px;
-        }
-
-        .target-name {
-            font-size: 1.25rem;
-            font-weight: 800;
-            color: #4a4e69;
-            margin-bottom: 6px;
-        }
-
-        .target-dist {
-            font-size: 0.95rem;
-            color: #ff7f50;
-            font-weight: 700;
-        }
+        .target-title { font-size: 0.85rem; color: #8a817c; margin-bottom: 4px; }
+        .target-name { font-size: 1.25rem; font-weight: 800; color: #4a4e69; margin-bottom: 6px; }
+        .target-dist { font-size: 0.95rem; color: #ff7f50; font-weight: 700; }
 
         .progress-bar-bg {
-            width: 100%;
-            height: 10px;
-            background: #e9ecef;
-            border-radius: 10px;
-            margin-top: 10px;
-            overflow: hidden;
+            width: 100%; height: 10px; background: #e9ecef;
+            border-radius: 10px; margin-top: 10px; overflow: hidden;
         }
 
         .progress-bar-fill {
-            height: 100%;
-            width: 0%;
+            height: 100%; width: 0%;
             background: linear-gradient(90deg, var(--pastel-pink), var(--pastel-yellow));
-            border-radius: 10px;
-            transition: width 0.5s ease;
+            border-radius: 10px; transition: width 0.5s ease;
         }
 
         .custom-icon {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 28px;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+            display: flex; justify-content: center; align-items: center;
+            font-size: 28px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
         }
 
         .player-avatar {
-            width: 24px;
-            height: 24px;
-            background-color: #3a86ff;
-            border: 3px solid #ffffff;
-            border-radius: 50%;
+            width: 24px; height: 24px; background-color: #3a86ff;
+            border: 3px solid #ffffff; border-radius: 50%;
             box-shadow: 0 0 12px rgba(58, 134, 255, 0.6);
             animation: pulse 1.8s infinite;
         }
@@ -155,64 +190,52 @@
         }
 
         .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(4px);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); z-index: 2000;
+            justify-content: center; align-items: center;
         }
 
         .modal-content {
-            background: #ffffff;
-            padding: 24px;
-            border-radius: 28px;
-            width: 85%;
-            max-width: 360px;
-            text-align: center;
+            background: #ffffff; padding: 24px; border-radius: 28px;
+            width: 85%; max-width: 360px; text-align: center;
             box-shadow: 0 15px 30px rgba(0,0,0,0.15);
         }
 
         .modal-btn {
-            margin-top: 16px;
-            padding: 10px 24px;
-            background: var(--pastel-pink);
-            color: white;
-            border: none;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            cursor: pointer;
+            margin-top: 16px; padding: 10px 24px; background: var(--pastel-pink);
+            color: white; border: none; border-radius: 20px; font-weight: 700;
+            font-size: 0.95rem; cursor: pointer;
         }
 
         .toast {
-            position: absolute;
-            top: 85px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1500;
-            background: rgba(60, 60, 60, 0.85);
-            color: white;
-            padding: 8px 18px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            display: none;
+            position: absolute; top: 85px; left: 50%; transform: translateX(-50%);
+            z-index: 1500; background: rgba(60, 60, 60, 0.85); color: white;
+            padding: 8px 18px; border-radius: 20px; font-size: 0.85rem; display: none;
             backdrop-filter: blur(4px);
         }
     </style>
 </head>
 <body>
 
+    <!-- 🔒 未登入強制遮罩 -->
+    <div class="login-overlay" id="login-overlay">
+        <div class="login-card">
+            <div style="font-size: 3.5rem; margin-bottom: 12px;">🌸</div>
+            <h2 style="color: #ff758c; font-weight: 800;">TAKAO WALK arr!</h2>
+            <button class="full-line-btn" onclick="loginWithLine()">使用 LINE 帳號登入</button>
+        </div>
+    </div>
+
     <div id="map"></div>
 
     <div class="hud-top">
-        <div class="brand-title">🌸 TAKAO WALK arr!</div>
-        <div class="radar-status" id="radar-status">📡 定位初始化...</div>
+        <div class="brand-container">
+            <div class="brand-title">🌸 TAKAO WALK arr!</div>
+            <div class="user-name" id="user-name">👤 驗證中...</div>
+        </div>
+        <div id="auth-action-area">
+            <div class="dist-tracker" id="total-walked">🚶 0.00 km</div>
+        </div>
     </div>
 
     <div class="hud-bottom">
@@ -230,43 +253,18 @@
         <div class="modal-content">
             <div style="font-size: 3rem; margin-bottom: 8px;">🎉</div>
             <h2 style="color: #ff758c; margin-bottom: 8px;">任務完成！</h2>
-            <p style="color: #6c757d; font-size: 0.9rem; line-height: 1.5;">你已踏遍 TAKAO WALK arr! 所有馬卡龍景點！</p>
+            <p style="color: #6c757d; font-size: 0.9rem; line-height: 1.5;">你已踏遍 TAKAO WALK arr! 所有景點！</p>
             <button class="modal-btn" onclick="closeModal('win-modal')">太棒了！</button>
         </div>
     </div>
 
     <script>
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        let audioCtx;
+        // ⚙️ 設定區
+        const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbx-ZuM0QX6rncNxsUcBct7CIcK89UVhgn3KOsJiPRug4NIFzTzX3LdtCUgd-546oRSJSQ/exec';
+        const LINE_CHANNEL_ID = 'YOUR_LINE_CHANNEL_ID'; // 請填入您的 LINE Channel ID
 
-        function playSound(type) {
-            if (!audioCtx) audioCtx = new AudioCtx();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            if (type === 'whistle') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(1800, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(2200, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.2);
-            } else if (type === 'collect') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
-                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
-                osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2);
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.4);
-            }
-        }
+        let currentLineId = null;
+        let currentName = null;
 
         const spots = [
             { id: 1, name: '奇美博物館', lat: 22.9348, lng: 120.2260, desc: '西洋藝術與古典城堡建築', icon: '🏛️', collected: false },
@@ -280,130 +278,153 @@
 
         let userCoords = [22.6250, 120.3000];
         let map, playerMarker;
-        let spotMarkers = {};
+        let totalDistanceMeters = 0;
+        let previousPosition = null;
 
         function initMap() {
+            const taiwanBounds = L.latLngBounds(L.latLng(20.5, 118.0), L.latLng(26.5, 124.0));
+
             map = L.map('map', {
-                zoomControl: false,
-                attributionControl: false
+                zoomControl: false, attributionControl: false,
+                minZoom: 7, maxZoom: 16,
+                maxBounds: taiwanBounds, maxBoundsViscosity: 1.0
             }).setView(userCoords, 13);
 
-            // 💡 使用 MapTiler 標準點陣圖磚 (百分百極速相容)
             L.tileLayer('https://api.maptiler.com/maps/aquarelle-v4/256/{z}/{x}/{y}.png?key=DDhwtFjCbEWiteavezOK', {
-                maxZoom: 19
+                minZoom: 7, maxZoom: 16, noWrap: true
             }).addTo(map);
 
             const playerIcon = L.divIcon({
                 className: 'player-marker',
                 html: '<div class="player-avatar"></div>',
-                iconSize: [24, 24],
-                iconAnchor: [12, 12]
+                iconSize: [24, 24], iconAnchor: [12, 12]
             });
             playerMarker = L.marker(userCoords, { icon: playerIcon }).addTo(map);
 
             spots.forEach(spot => {
                 const icon = L.divIcon({
-                    className: 'custom-icon',
-                    html: `<div>${spot.icon}</div>`,
-                    iconSize: [30, 30],
-                    iconAnchor: [15, 15]
+                    className: 'custom-icon', html: `<div>${spot.icon}</div>`,
+                    iconSize: [30, 30], iconAnchor: [15, 15]
                 });
-
                 const marker = L.marker([spot.lat, spot.lng], { icon: icon }).addTo(map);
                 marker.bindPopup(`<b>${spot.name}</b><br>${spot.desc}`);
-                spotMarkers[spot.id] = marker;
             });
 
-            map.on('click', (e) => {
-                userCoords = [e.latlng.lat, e.latlng.lng];
-                updatePlayerPosition(userCoords);
-                playSound('whistle');
-            });
+            checkUrlParamsAndInit();
+        }
 
-            startGeolocation();
+        function loginWithLine() {
+            const redirectUri = encodeURIComponent(GAS_API_URL);
+            const lineAuthUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CHANNEL_ID}&redirect_uri=${redirectUri}&state=takaowalk&scope=profile%20openid`;
+            window.location.href = lineAuthUrl;
+        }
+
+        function checkUrlParamsAndInit() {
+            const params = new URLSearchParams(window.location.search);
+            
+            if (params.has('line_id')) {
+                document.getElementById('login-overlay').style.display = 'none';
+
+                currentLineId = params.get('line_id');
+                currentName = params.get('name');
+                const savedDist = parseFloat(params.get('dist') || '0');
+                const savedSpots = (params.get('spots') || '').split(',');
+
+                document.getElementById('user-name').innerText = `👤 ${currentName}`;
+                totalDistanceMeters = savedDist * 1000;
+                document.getElementById('total-walked').innerText = `🚶 ${savedDist.toFixed(2)} km`;
+
+                spots.forEach(spot => {
+                    if (savedSpots.includes(spot.id.toString())) {
+                        spot.collected = true;
+                    }
+                });
+
+                updateProgressUI();
+                startGeolocation();
+            } else {
+                document.getElementById('login-overlay').style.display = 'flex';
+            }
+        }
+
+        function syncDataToGAS() {
+            if (!currentLineId) return;
+
+            const collectedSpotIds = spots.filter(s => s.collected).map(s => s.id).join(',');
+            const km = (totalDistanceMeters / 1000).toFixed(2);
+
+            const url = `${GAS_API_URL}?action=updateData&line_id=${encodeURIComponent(currentLineId)}&dist=${km}&spots=${encodeURIComponent(collectedSpotIds)}`;
+            fetch(url, { mode: 'no-cors' });
         }
 
         function getDistance(lat1, lon1, lat2, lon2) {
             const R = 6371e3;
-            const φ1 = lat1 * Math.PI / 180;
-            const φ2 = lat2 * Math.PI / 180;
-            const Δφ = (lat2 - lat1) * Math.PI / 180;
-            const Δλ = (lon2 - lon1) * Math.PI / 180;
-
-            const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-                      Math.cos(φ1) * Math.cos(φ2) *
-                      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return Math.round(R * c);
+            const φ1 = lat1 * Math.PI / 180, φ2 = lat2 * Math.PI / 180;
+            const Δφ = (lat2 - lat1) * Math.PI / 180, Δλ = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+            return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
         }
 
         function updatePlayerPosition(coords) {
+            if (previousPosition) {
+                const moved = getDistance(previousPosition[0], previousPosition[1], coords[0], coords[1]);
+                if (moved >= 3) {
+                    totalDistanceMeters += moved;
+                    previousPosition = coords;
+                    syncDataToGAS();
+                }
+            } else {
+                previousPosition = coords;
+            }
+
+            const walkedEl = document.getElementById('total-walked');
+            if (walkedEl) walkedEl.innerText = `🚶 ${(totalDistanceMeters / 1000).toFixed(2)} km`;
+
             playerMarker.setLatLng(coords);
 
-            let nearest = null;
-            let minDist = Infinity;
-            let collectedCount = 0;
-
+            let nearest = null, minDist = Infinity;
             spots.forEach(spot => {
                 const dist = getDistance(coords[0], coords[1], spot.lat, spot.lng);
                 if (dist <= 50 && !spot.collected) {
                     spot.collected = true;
-                    playSound('collect');
                     showToast(`✨ 解鎖成功：${spot.name}！`);
+                    syncDataToGAS();
                 }
-
-                if (spot.collected) collectedCount++;
-
-                if (dist < minDist) {
-                    minDist = dist;
-                    nearest = spot;
-                }
+                if (dist < minDist) { minDist = dist; nearest = spot; }
             });
 
             if (nearest) {
                 document.getElementById('target-name').innerText = `${nearest.icon} ${nearest.name}`;
                 document.getElementById('target-dist').innerText = minDist > 1000 ? `${(minDist / 1000).toFixed(1)} km` : `${minDist} m`;
             }
+            updateProgressUI();
+        }
 
-            const progressPercent = (collectedCount / spots.length) * 100;
-            document.getElementById('progress-fill').style.width = `${progressPercent}%`;
-
+        function updateProgressUI() {
+            const collectedCount = spots.filter(s => s.collected).length;
+            document.getElementById('progress-fill').style.width = `${(collectedCount / spots.length) * 100}%`;
             if (collectedCount === spots.length) {
                 document.getElementById('win-modal').style.display = 'flex';
             }
         }
 
         function startGeolocation() {
-            const statusEl = document.getElementById('radar-status');
-
-            if (!navigator.geolocation) {
-                statusEl.innerText = "⚠️ 瀏覽器不支援 GPS";
-                return;
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(
+                    pos => updatePlayerPosition([pos.coords.latitude, pos.coords.longitude]),
+                    err => console.log('GPS 權限未開啟'),
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
             }
-
-            navigator.geolocation.watchPosition(
-                (pos) => {
-                    statusEl.innerText = "📡 雷達連線中";
-                    userCoords = [pos.coords.latitude, pos.coords.longitude];
-                    updatePlayerPosition(userCoords);
-                },
-                (err) => {
-                    statusEl.innerText = "💡 試玩模式 (點地圖移動)";
-                },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-            );
         }
 
         function showToast(msg) {
             const toast = document.getElementById('toast');
-            toast.innerText = msg;
-            toast.style.display = 'block';
+            toast.innerText = msg; toast.style.display = 'block';
             setTimeout(() => { toast.style.display = 'none'; }, 3000);
         }
 
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
-        }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
         window.onload = initMap;
     </script>
