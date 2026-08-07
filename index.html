@@ -28,17 +28,23 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* 🖥️ 強制全螢幕與動態高度鎖定 */
         body, html {
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
             overflow: hidden;
             background-color: var(--pastel-bg);
             color: var(--text-color);
+            position: fixed;
+            top: 0;
+            left: 0;
         }
 
         #map {
-            width: 100%;
+            width: 100vw;
             height: 100vh;
+            height: 100dvh;
             z-index: 1;
         }
 
@@ -49,11 +55,11 @@
             left: 0;
             width: 100vw;
             height: 100vh;
+            height: 100dvh;
             z-index: 3000;
             display: flex;
             justify-content: center;
             align-items: flex-end;
-            /* ⬆️ 再往上抬高，確保避開 Safari 下方網址列 */
             padding-bottom: calc(18vh + env(safe-area-inset-bottom, 30px));
             background-color: #f7f5f0;
             overflow: hidden;
@@ -66,6 +72,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
+            height: 100dvh;
             z-index: 1;
             display: block;
         }
@@ -73,6 +80,7 @@
         .bg-cover-image {
             width: 100vw;
             height: 100vh;
+            height: 100dvh;
             object-fit: cover;
             object-position: center;
             display: block;
@@ -238,12 +246,10 @@
 </head>
 <body>
 
-    <!-- 🔒 滿版封面 + 底部 LINE 登入按鈕 -->
+    <!-- 🔒 滿版強制登入遮罩 -->
     <div class="login-overlay" id="login-overlay">
         <picture class="bg-cover-picture">
-            <!-- 橫向裝置（電腦 / 平板橫放）使用 cover_computer.jpg -->
             <source media="(orientation: landscape)" srcset="cover_computer.jpg">
-            <!-- 直向裝置（手機 / 平板直放）預設使用 cover_phone.jpg -->
             <img src="cover_phone.jpg" alt="" class="bg-cover-image">
         </picture>
         
@@ -285,6 +291,18 @@
     </div>
 
     <script>
+        // 🖥️ 請求全螢幕函數 (相容各瀏覽器)
+        function requestFullScreenMode() {
+            const doc = document.documentElement;
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                if (doc.requestFullscreen) {
+                    doc.requestFullscreen().catch(() => {});
+                } else if (doc.webkitRequestFullscreen) {
+                    doc.webkitRequestFullscreen();
+                }
+            }
+        }
+
         // ⚙️ 設定區
         const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbx-ZuM0QX6rncNxsUcBct7CIcK89UVhgn3KOsJiPRug4NIFzTzX3LdtCUgd-546oRSJSQ/exec';
         const LINE_CHANNEL_ID = '2011007742';
@@ -340,6 +358,7 @@
         }
 
         function loginWithLine() {
+            requestFullScreenMode(); // 觸發電腦全螢幕
             const redirectUri = encodeURIComponent(GAS_API_URL);
             const lineAuthUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CHANNEL_ID}&redirect_uri=${redirectUri}&state=takaowalk&scope=profile%20openid`;
             window.location.href = lineAuthUrl;
@@ -451,6 +470,9 @@
         }
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // 🖱️ 首次點擊網頁任意處自動請求電腦版全螢幕
+        window.addEventListener('click', requestFullScreenMode, { once: true });
 
         window.onload = initMap;
     </script>
