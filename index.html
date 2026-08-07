@@ -9,11 +9,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <!-- MapTiler SDK & Leaflet Plugin CDN -->
-    <link href="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.0/maptiler-sdk.css" rel="stylesheet" />
-    <script src="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.0/maptiler-sdk.umd.js"></script>
-    <script src="https://cdn.maptiler.com/leaflet-maptilersdk/v2.0.0/leaflet-maptilersdk.js"></script>
-
     <style>
         :root {
             --pastel-bg: #fffcf5;
@@ -293,10 +288,9 @@
                 attributionControl: false
             }).setView(userCoords, 13);
 
-            // 💡 使用你的 MapTiler Key 載入 Aquarelle 馬卡龍水彩風格
-            const mtLayer = new L.maptiler.MaptilerLayer({
-                apiKey: "DDhwtFjCbEWiteavezOK",
-                style: "aquarelle"
+            // 💡 使用 MapTiler 標準點陣圖磚 (百分百極速相容)
+            L.tileLayer('https://api.maptiler.com/maps/aquarelle-v4/256/{z}/{x}/{y}.png?key=DDhwtFjCbEWiteavezOK', {
+                maxZoom: 19
             }).addTo(map);
 
             const playerIcon = L.divIcon({
