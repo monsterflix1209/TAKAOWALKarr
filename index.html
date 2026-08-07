@@ -59,7 +59,7 @@
             display: flex;
             justify-content: center;
             align-items: flex-end;
-            padding-bottom: calc(18vh + env(safe-area-inset-bottom, 30px));
+            padding-bottom: calc(15vh + env(safe-area-inset-bottom, 30px));
             background-color: #f7f5f0;
             overflow: hidden;
         }
@@ -85,13 +85,15 @@
             display: block;
         }
 
-        /* 🔘 LINE 登入按鈕區塊 */
+        /* 🔘 按鈕區塊 */
         .login-content {
             position: relative;
             z-index: 2;
             width: 85%;
             max-width: 320px;
             display: flex;
+            flex-direction: column;
+            gap: 12px;
             justify-content: center;
             align-items: center;
         }
@@ -112,6 +114,25 @@
         }
 
         .full-line-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* ⚠️ 測試專用：跳過按鈕樣式 */
+        .test-skip-btn {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #5c544d;
+            border: 2px dashed #ff758c;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            transition: transform 0.15s ease, background-color 0.2s;
+        }
+
+        .test-skip-btn:active {
             transform: scale(0.96);
         }
 
@@ -156,6 +177,26 @@
             margin-top: 2px;
         }
 
+        /* 🎵 音樂切換按鈕樣式 */
+        .bgm-btn {
+            background: #ffffff;
+            border: 2px solid #ffccd5;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            transition: transform 0.15s ease;
+        }
+
+        .bgm-btn:active {
+            transform: scale(0.9);
+        }
+
         .dist-tracker {
             font-size: 0.85rem;
             background: #fff0f3;
@@ -185,7 +226,16 @@
         }
 
         .target-title { font-size: 0.85rem; color: #8a817c; margin-bottom: 4px; }
-        .target-name { font-size: 1.25rem; font-weight: 800; color: #4a4e69; margin-bottom: 6px; }
+        .target-name { 
+            font-size: 1.25rem; 
+            font-weight: 800; 
+            color: #4a4e69; 
+            margin-bottom: 6px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
         .target-dist { font-size: 0.95rem; color: #ff7f50; font-weight: 700; }
 
         .progress-bar-bg {
@@ -199,9 +249,24 @@
             border-radius: 10px; transition: width 0.5s ease;
         }
 
-        .custom-icon {
-            display: flex; justify-content: center; align-items: center;
-            font-size: 28px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+        /* 🪙 金幣圖示樣式 */
+        .coin-icon-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .coin-icon-img {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25));
+        }
+
+        .hud-coin-img {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
         }
 
         .player-avatar {
@@ -245,6 +310,9 @@
 </head>
 <body>
 
+    <!-- 🎵 背景音樂標籤 (自動循環播放) -->
+    <audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
+
     <!-- 🔒 滿版登入遮罩 -->
     <div class="login-overlay" id="login-overlay">
         <picture class="bg-cover-picture">
@@ -254,6 +322,9 @@
         
         <div class="login-content">
             <button class="full-line-btn" onclick="loginWithLine()">使用 LINE 帳號登入</button>
+            
+            <!-- ⚠️ 測試專用：跳過登入按鈕 (正式上線前刪除此段) -->
+            <button class="test-skip-btn" onclick="skipLoginForTesting()">⚡ 測試模式（跳過登入）</button>
         </div>
     </div>
 
@@ -264,7 +335,8 @@
             <div class="brand-title">🌸 TAKAO WALK arr!</div>
             <div class="user-name" id="user-name">👤 驗證中...</div>
         </div>
-        <div id="auth-action-area">
+        <div id="auth-action-area" style="display: flex; gap: 8px; align-items: center;">
+            <button class="bgm-btn" id="bgm-btn" onclick="toggleBGM()">🔇</button>
             <div class="dist-tracker" id="total-walked">🚶 0.00 km</div>
         </div>
     </div>
@@ -296,21 +368,52 @@
 
         let currentLineId = null;
         let currentName = null;
+        let isBgmPlaying = false;
 
+        // 🟡 景點資料庫（各自指定獨立金幣圖片）
         const spots = [
-            { id: 1, name: '奇美博物館', lat: 22.9348, lng: 120.2260, desc: '西洋藝術與古典城堡建築', icon: '🏛️', collected: false },
-            { id: 2, name: '科工館', lat: 22.6405, lng: 120.3228, desc: '充滿驚奇與科幻的探索基地', icon: '🔬', collected: false },
-            { id: 3, name: '六合夜市', lat: 22.6331, lng: 120.3002, desc: '飄香數十年的經典高雄美食地標', icon: '🍢', collected: false },
-            { id: 4, name: '新崛江', lat: 22.6222, lng: 120.3015, desc: '潮流與時尚聚集的青藝天地', icon: '🛍️', collected: false },
-            { id: 5, name: '駁二特區', lat: 22.6198, lng: 120.2818, desc: '港區倉庫改建的文創冒險樂園', icon: '🎨', collected: false },
-            { id: 6, name: '哈瑪星', lat: 22.6215, lng: 120.2710, desc: '大片草地與舊鐵道的港灣時光', icon: '🚂', collected: false },
-            { id: 7, name: 'SKM Park', lat: 22.5815, lng: 120.3300, desc: '美式樂園風的購物與遊樂天堂', icon: '🎡', collected: false }
+            { id: 1, name: '奇美博物館', lat: 22.9348, lng: 120.2260, desc: '西洋藝術與古典城堡建築', icon: 'coin_chimei.png', collected: false },
+            { id: 2, name: '科工館', lat: 22.6405, lng: 120.3228, desc: '充滿驚奇與科幻的探索基地', icon: 'coin_science.png', collected: false },
+            { id: 3, name: '六合夜市', lat: 22.6331, lng: 120.3002, desc: '飄香數十年的經典高雄美食地標', icon: 'coin_liuhe.png', collected: false },
+            { id: 4, name: '新崛江', lat: 22.6222, lng: 120.3015, desc: '潮流與時尚聚集的青藝天地', icon: 'coin_shinkuchan.png', collected: false },
+            { id: 5, name: '駁二特區', lat: 22.6198, lng: 120.2818, desc: '港區倉庫改建的文創冒險樂園', icon: 'coin_pier2.png', collected: false },
+            { id: 6, name: '哈瑪星', lat: 22.6215, lng: 120.2710, desc: '大片草地與舊鐵道的港灣時光', icon: 'coin_hamasen.png', collected: false },
+            { id: 7, name: 'SKM Park', lat: 22.5815, lng: 120.3300, desc: '美式樂園風的購物與遊樂天堂', icon: 'coin_skmpark.png', collected: false }
         ];
 
         let userCoords = [22.6250, 120.3000];
         let map, playerMarker;
         let totalDistanceMeters = 0;
         let previousPosition = null;
+
+        // 🎵 背景音樂控制功能
+        function startBGM() {
+            const bgm = document.getElementById('bgm');
+            const btn = document.getElementById('bgm-btn');
+            bgm.volume = 0.2; // 🔊 將音量調低至 20%
+            
+            bgm.play().then(() => {
+                isBgmPlaying = true;
+                btn.innerText = '🎵';
+            }).catch(err => {
+                console.log('等待使用者手動點擊觸發音樂');
+            });
+        }
+
+        function toggleBGM() {
+            const bgm = document.getElementById('bgm');
+            const btn = document.getElementById('bgm-btn');
+            
+            if (isBgmPlaying) {
+                bgm.pause();
+                btn.innerText = '🔇';
+            } else {
+                bgm.volume = 0.2;
+                bgm.play();
+                btn.innerText = '🎵';
+            }
+            isBgmPlaying = !isBgmPlaying;
+        }
 
         function initMap() {
             const taiwanBounds = L.latLngBounds(L.latLng(20.5, 118.0), L.latLng(26.5, 124.0));
@@ -332,10 +435,13 @@
             });
             playerMarker = L.marker(userCoords, { icon: playerIcon }).addTo(map);
 
+            // 🪙 繪製專屬金幣標記
             spots.forEach(spot => {
                 const icon = L.divIcon({
-                    className: 'custom-icon', html: `<div>${spot.icon}</div>`,
-                    iconSize: [30, 30], iconAnchor: [15, 15]
+                    className: 'coin-icon-wrapper', 
+                    html: `<img src="${spot.icon}" class="coin-icon-img" alt="${spot.name}">`,
+                    iconSize: [36, 36], 
+                    iconAnchor: [18, 18]
                 });
                 const marker = L.marker([spot.lat, spot.lng], { icon: icon }).addTo(map);
                 marker.bindPopup(`<b>${spot.name}</b><br>${spot.desc}`);
@@ -345,9 +451,24 @@
         }
 
         function loginWithLine() {
+            startBGM(); // 點擊時播放音樂
             const redirectUri = encodeURIComponent(GAS_API_URL);
             const lineAuthUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CHANNEL_ID}&redirect_uri=${redirectUri}&state=takaowalk&scope=profile%20openid`;
             window.location.href = lineAuthUrl;
+        }
+
+        /* ⚠️ 測試專用：跳過登入函式 (正式上線前刪除此段) */
+        function skipLoginForTesting() {
+            startBGM(); // 點擊時播放音樂
+            document.getElementById('login-overlay').style.display = 'none';
+            currentLineId = 'test_guest';
+            currentName = '測試玩家';
+            document.getElementById('user-name').innerText = `👤 ${currentName}`;
+            totalDistanceMeters = 0;
+            document.getElementById('total-walked').innerText = `🚶 0.00 km`;
+            updateProgressUI();
+            startGeolocation();
+            showToast('⚡ 已進入測試模式');
         }
 
         function checkUrlParamsAndInit() {
@@ -379,7 +500,7 @@
         }
 
         function syncDataToGAS() {
-            if (!currentLineId) return;
+            if (!currentLineId || currentLineId === 'test_guest') return;
 
             const collectedSpotIds = spots.filter(s => s.collected).map(s => s.id).join(',');
             const km = (totalDistanceMeters / 1000).toFixed(2);
@@ -425,7 +546,7 @@
             });
 
             if (nearest) {
-                document.getElementById('target-name').innerText = `${nearest.icon} ${nearest.name}`;
+                document.getElementById('target-name').innerHTML = `<img src="${nearest.icon}" class="hud-coin-img" alt="${nearest.name}"> ${nearest.name}`;
                 document.getElementById('target-dist').innerText = minDist > 1000 ? `${(minDist / 1000).toFixed(1)} km` : `${minDist} m`;
             }
             updateProgressUI();
