@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TAKAO WALK arr!</title>
     
-    <!-- 🌸 遊戲瀏覽器圖標 -->
-    <link rel="icon" href="./icon.png" type="image/png">
+    <!-- 🌸 遊戲瀏覽器圖標 (JPG) -->
+    <link rel="icon" href="./logo.jpg" type="image/jpeg">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -42,66 +42,46 @@
             z-index: 1;
         }
 
-        /* 🔒 滿版強制登入遮罩 / 封面 */
+        /* 🔒 滿版強制登入遮罩 / 滿版封面 */
         .login-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(255, 252, 245, 0.95);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             z-index: 3000;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 24px;
-            text-align: center;
+            overflow: hidden;
         }
 
-        .login-card {
-            background: #ffffff;
-            padding: 28px 24px;
-            border-radius: 32px;
-            box-shadow: 0 20px 40px rgba(180, 160, 150, 0.25);
-            border: 2px solid #ffffff;
-            max-width: 340px;
+        /* 🖼️ 全螢幕滿版圖片設定 */
+        .bg-cover-picture {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: all 0.3s ease;
+            height: 100%;
+            z-index: 1;
         }
 
-        /* 🖼️ 響應式封面樣式 */
-        .cover-picture {
+        .bg-cover-image {
             width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        /* 🔘 置中內容與按鈕區塊 */
+        .login-content {
+            position: relative;
+            z-index: 2;
+            width: 85%;
+            max-width: 320px;
             display: flex;
             justify-content: center;
-            margin-bottom: 12px;
-        }
-
-        .cover-image {
-            width: 100%;
-            max-width: 280px;
-            max-height: 45vh;
-            object-fit: contain;
-            border-radius: 20px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
-        }
-
-        /* 💻 橫向螢幕（電腦/平板橫放）微調 */
-        @media (orientation: landscape) {
-            .login-card {
-                max-width: 460px;
-                padding: 20px 28px;
-            }
-            .cover-image {
-                max-width: 380px;
-                max-height: 50vh;
-            }
+            align-items: center;
         }
 
         .full-line-btn {
@@ -109,18 +89,18 @@
             background-color: #06C755;
             color: white;
             border: none;
-            padding: 14px;
-            border-radius: 20px;
+            padding: 16px 24px;
+            border-radius: 30px;
             font-weight: 800;
-            font-size: 1rem;
+            font-size: 1.1rem;
             cursor: pointer;
-            margin-top: 8px;
-            box-shadow: 0 6px 16px rgba(6, 199, 85, 0.3);
-            transition: transform 0.1s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+            transition: transform 0.15s ease, background-color 0.2s;
+            letter-spacing: 0.5px;
         }
 
         .full-line-btn:active {
-            transform: scale(0.98);
+            transform: scale(0.96);
         }
 
         .hud-top {
@@ -147,326 +127,3 @@
             flex-direction: column;
             align-items: flex-start;
         }
-
-        .brand-title {
-            font-weight: 800;
-            font-size: 1.05rem;
-            color: #ff758c;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .user-name {
-            font-size: 0.75rem;
-            color: #4a4e69;
-            font-weight: 700;
-            margin-top: 2px;
-        }
-
-        .dist-tracker {
-            font-size: 0.85rem;
-            background: #fff0f3;
-            padding: 6px 12px;
-            border-radius: 14px;
-            color: #ff4d6d;
-            font-weight: 800;
-            white-space: nowrap;
-            border: 1px solid #ffccd5;
-        }
-
-        .hud-bottom {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            width: 90%;
-            max-width: 420px;
-            background: var(--pastel-card);
-            backdrop-filter: blur(8px);
-            padding: 16px;
-            border-radius: 24px;
-            box-shadow: 0 10px 25px rgba(180, 160, 150, 0.18);
-            border: 2px solid #ffffff;
-            text-align: center;
-        }
-
-        .target-title { font-size: 0.85rem; color: #8a817c; margin-bottom: 4px; }
-        .target-name { font-size: 1.25rem; font-weight: 800; color: #4a4e69; margin-bottom: 6px; }
-        .target-dist { font-size: 0.95rem; color: #ff7f50; font-weight: 700; }
-
-        .progress-bar-bg {
-            width: 100%; height: 10px; background: #e9ecef;
-            border-radius: 10px; margin-top: 10px; overflow: hidden;
-        }
-
-        .progress-bar-fill {
-            height: 100%; width: 0%;
-            background: linear-gradient(90deg, var(--pastel-pink), var(--pastel-yellow));
-            border-radius: 10px; transition: width 0.5s ease;
-        }
-
-        .custom-icon {
-            display: flex; justify-content: center; align-items: center;
-            font-size: 28px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
-        }
-
-        .player-avatar {
-            width: 24px; height: 24px; background-color: #3a86ff;
-            border: 3px solid #ffffff; border-radius: 50%;
-            box-shadow: 0 0 12px rgba(58, 134, 255, 0.6);
-            animation: pulse 1.8s infinite;
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(58, 134, 255, 0.6); }
-            70% { box-shadow: 0 0 0 14px rgba(58, 134, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(58, 134, 255, 0); }
-        }
-
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); z-index: 2000;
-            justify-content: center; align-items: center;
-        }
-
-        .modal-content {
-            background: #ffffff; padding: 24px; border-radius: 28px;
-            width: 85%; max-width: 360px; text-align: center;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-        }
-
-        .modal-btn {
-            margin-top: 16px; padding: 10px 24px; background: var(--pastel-pink);
-            color: white; border: none; border-radius: 20px; font-weight: 700;
-            font-size: 0.95rem; cursor: pointer;
-        }
-
-        .toast {
-            position: absolute; top: 85px; left: 50%; transform: translateX(-50%);
-            z-index: 1500; background: rgba(60, 60, 60, 0.85); color: white;
-            padding: 8px 18px; border-radius: 20px; font-size: 0.85rem; display: none;
-            backdrop-filter: blur(4px);
-        }
-    </style>
-</head>
-<body>
-
-    <!-- 🔒 未登入強制遮罩 / 響應式封面 -->
-    <div class="login-overlay" id="login-overlay">
-        <div class="login-card">
-            <picture class="cover-picture">
-                <!-- 橫向裝置（電腦 / 平板橫放）使用 cover_computer.png -->
-                <source media="(orientation: landscape)" srcset="./cover_computer.png">
-                <!-- 直向裝置（手機 / 平板直放）預設使用 cover_phone.png -->
-                <img src="./cover_phone.png" alt="TAKAO WALK arr!" class="cover-image">
-            </picture>
-            <button class="full-line-btn" onclick="loginWithLine()">使用 LINE 帳號登入</button>
-        </div>
-    </div>
-
-    <div id="map"></div>
-
-    <div class="hud-top">
-        <div class="brand-container">
-            <div class="brand-title">🌸 TAKAO WALK arr!</div>
-            <div class="user-name" id="user-name">👤 驗證中...</div>
-        </div>
-        <div id="auth-action-area">
-            <div class="dist-tracker" id="total-walked">🚶 0.00 km</div>
-        </div>
-    </div>
-
-    <div class="hud-bottom">
-        <div class="target-title">距離最近的冒險點</div>
-        <div class="target-name" id="target-name">搜尋中...</div>
-        <div class="target-dist" id="target-dist">-- m</div>
-        <div class="progress-bar-bg">
-            <div class="progress-bar-fill" id="progress-fill"></div>
-        </div>
-    </div>
-
-    <div class="toast" id="toast"></div>
-
-    <div class="modal" id="win-modal">
-        <div class="modal-content">
-            <div style="font-size: 3rem; margin-bottom: 8px;">🎉</div>
-            <h2 style="color: #ff758c; margin-bottom: 8px;">任務完成！</h2>
-            <p style="color: #6c757d; font-size: 0.9rem; line-height: 1.5;">你已踏遍 TAKAO WALK arr! 所有景點！</p>
-            <button class="modal-btn" onclick="closeModal('win-modal')">太棒了！</button>
-        </div>
-    </div>
-
-    <script>
-        // ⚙️ 設定區
-        const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbx-ZuM0QX6rncNxsUcBct7CIcK89UVhgn3KOsJiPRug4NIFzTzX3LdtCUgd-546oRSJSQ/exec';
-        const LINE_CHANNEL_ID = '2011007742';
-
-        let currentLineId = null;
-        let currentName = null;
-
-        const spots = [
-            { id: 1, name: '奇美博物館', lat: 22.9348, lng: 120.2260, desc: '西洋藝術與古典城堡建築', icon: '🏛️', collected: false },
-            { id: 2, name: '科工館', lat: 22.6405, lng: 120.3228, desc: '充滿驚奇與科幻的探索基地', icon: '🔬', collected: false },
-            { id: 3, name: '六合夜市', lat: 22.6331, lng: 120.3002, desc: '飄香數十年的經典高雄美食地標', icon: '🍢', collected: false },
-            { id: 4, name: '新崛江', lat: 22.6222, lng: 120.3015, desc: '潮流與時尚聚集的青藝天地', icon: '🛍️', collected: false },
-            { id: 5, name: '駁二特區', lat: 22.6198, lng: 120.2818, desc: '港區倉庫改建的文創冒險樂園', icon: '🎨', collected: false },
-            { id: 6, name: '哈瑪星', lat: 22.6215, lng: 120.2710, desc: '大片草地與舊鐵道的港灣時光', icon: '🚂', collected: false },
-            { id: 7, name: 'SKM Park', lat: 22.5815, lng: 120.3300, desc: '美式樂園風的購物與遊樂天堂', icon: '🎡', collected: false }
-        ];
-
-        let userCoords = [22.6250, 120.3000];
-        let map, playerMarker;
-        let totalDistanceMeters = 0;
-        let previousPosition = null;
-
-        function initMap() {
-            const taiwanBounds = L.latLngBounds(L.latLng(20.5, 118.0), L.latLng(26.5, 124.0));
-
-            map = L.map('map', {
-                zoomControl: false, attributionControl: false,
-                minZoom: 7, maxZoom: 16,
-                maxBounds: taiwanBounds, maxBoundsViscosity: 1.0
-            }).setView(userCoords, 13);
-
-            L.tileLayer('https://api.maptiler.com/maps/aquarelle-v4/256/{z}/{x}/{y}.png?key=DDhwtFjCbEWiteavezOK', {
-                minZoom: 7, maxZoom: 16, noWrap: true
-            }).addTo(map);
-
-            const playerIcon = L.divIcon({
-                className: 'player-marker',
-                html: '<div class="player-avatar"></div>',
-                iconSize: [24, 24], iconAnchor: [12, 12]
-            });
-            playerMarker = L.marker(userCoords, { icon: playerIcon }).addTo(map);
-
-            spots.forEach(spot => {
-                const icon = L.divIcon({
-                    className: 'custom-icon', html: `<div>${spot.icon}</div>`,
-                    iconSize: [30, 30], iconAnchor: [15, 15]
-                });
-                const marker = L.marker([spot.lat, spot.lng], { icon: icon }).addTo(map);
-                marker.bindPopup(`<b>${spot.name}</b><br>${spot.desc}`);
-            });
-
-            checkUrlParamsAndInit();
-        }
-
-        function loginWithLine() {
-            const redirectUri = encodeURIComponent(GAS_API_URL);
-            const lineAuthUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CHANNEL_ID}&redirect_uri=${redirectUri}&state=takaowalk&scope=profile%20openid`;
-            window.location.href = lineAuthUrl;
-        }
-
-        function checkUrlParamsAndInit() {
-            const params = new URLSearchParams(window.location.search);
-            
-            if (params.has('line_id')) {
-                document.getElementById('login-overlay').style.display = 'none';
-
-                currentLineId = params.get('line_id');
-                currentName = params.get('name');
-                const savedDist = parseFloat(params.get('dist') || '0');
-                const savedSpots = (params.get('spots') || '').split(',');
-
-                document.getElementById('user-name').innerText = `👤 ${currentName}`;
-                totalDistanceMeters = savedDist * 1000;
-                document.getElementById('total-walked').innerText = `🚶 ${savedDist.toFixed(2)} km`;
-
-                spots.forEach(spot => {
-                    if (savedSpots.includes(spot.id.toString())) {
-                        spot.collected = true;
-                    }
-                });
-
-                updateProgressUI();
-                startGeolocation();
-            } else {
-                document.getElementById('login-overlay').style.display = 'flex';
-            }
-        }
-
-        function syncDataToGAS() {
-            if (!currentLineId) return;
-
-            const collectedSpotIds = spots.filter(s => s.collected).map(s => s.id).join(',');
-            const km = (totalDistanceMeters / 1000).toFixed(2);
-
-            const url = `${GAS_API_URL}?action=updateData&line_id=${encodeURIComponent(currentLineId)}&dist=${km}&spots=${encodeURIComponent(collectedSpotIds)}`;
-            fetch(url, { mode: 'no-cors' });
-        }
-
-        function getDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371e3;
-            const φ1 = lat1 * Math.PI / 180, φ2 = lat2 * Math.PI / 180;
-            const Δφ = (lat2 - lat1) * Math.PI / 180, Δλ = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-            return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
-        }
-
-        function updatePlayerPosition(coords) {
-            if (previousPosition) {
-                const moved = getDistance(previousPosition[0], previousPosition[1], coords[0], coords[1]);
-                if (moved >= 3) {
-                    totalDistanceMeters += moved;
-                    previousPosition = coords;
-                    syncDataToGAS();
-                }
-            } else {
-                previousPosition = coords;
-            }
-
-            const walkedEl = document.getElementById('total-walked');
-            if (walkedEl) walkedEl.innerText = `🚶 ${(totalDistanceMeters / 1000).toFixed(2)} km`;
-
-            playerMarker.setLatLng(coords);
-
-            let nearest = null, minDist = Infinity;
-            spots.forEach(spot => {
-                const dist = getDistance(coords[0], coords[1], spot.lat, spot.lng);
-                if (dist <= 50 && !spot.collected) {
-                    spot.collected = true;
-                    showToast(`✨ 解鎖成功：${spot.name}！`);
-                    syncDataToGAS();
-                }
-                if (dist < minDist) { minDist = dist; nearest = spot; }
-            });
-
-            if (nearest) {
-                document.getElementById('target-name').innerText = `${nearest.icon} ${nearest.name}`;
-                document.getElementById('target-dist').innerText = minDist > 1000 ? `${(minDist / 1000).toFixed(1)} km` : `${minDist} m`;
-            }
-            updateProgressUI();
-        }
-
-        function updateProgressUI() {
-            const collectedCount = spots.filter(s => s.collected).length;
-            document.getElementById('progress-fill').style.width = `${(collectedCount / spots.length) * 100}%`;
-            if (collectedCount === spots.length) {
-                document.getElementById('win-modal').style.display = 'flex';
-            }
-        }
-
-        function startGeolocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.watchPosition(
-                    pos => updatePlayerPosition([pos.coords.latitude, pos.coords.longitude]),
-                    err => console.log('GPS 權限未開啟'),
-                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-                );
-            }
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.innerText = msg; toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 3000);
-        }
-
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        window.onload = initMap;
-    </script>
-</body>
-</html>
