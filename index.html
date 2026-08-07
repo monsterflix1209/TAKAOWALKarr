@@ -28,7 +28,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 🖥️ 強制全螢幕與動態高度鎖定 */
         body, html {
             width: 100vw;
             height: 100vh;
@@ -48,7 +47,7 @@
             z-index: 1;
         }
 
-        /* 🔒 滿版強制登入遮罩 */
+        /* 🔒 滿版登入遮罩 */
         .login-overlay {
             position: fixed;
             top: 0;
@@ -60,12 +59,13 @@
             display: flex;
             justify-content: center;
             align-items: flex-end;
+            /* ⬆️ 抬高按鈕避開 iOS Safari 底部導覽列與 Home 條 */
             padding-bottom: calc(18vh + env(safe-area-inset-bottom, 30px));
             background-color: #f7f5f0;
             overflow: hidden;
         }
 
-        /* 🖼️ 全螢幕滿版圖片設定 */
+        /* 🖼️ 背景圖片設定 */
         .bg-cover-picture {
             position: absolute;
             top: 0;
@@ -86,7 +86,7 @@
             display: block;
         }
 
-        /* 🔘 下方按鈕區塊 */
+        /* 🔘 LINE 登入按鈕區塊 */
         .login-content {
             position: relative;
             z-index: 2;
@@ -246,7 +246,7 @@
 </head>
 <body>
 
-    <!-- 🔒 滿版強制登入遮罩 -->
+    <!-- 🔒 滿版登入遮罩 -->
     <div class="login-overlay" id="login-overlay">
         <picture class="bg-cover-picture">
             <source media="(orientation: landscape)" srcset="cover_computer.jpg">
@@ -291,18 +291,6 @@
     </div>
 
     <script>
-        // 🖥️ 請求全螢幕函數 (相容各瀏覽器)
-        function requestFullScreenMode() {
-            const doc = document.documentElement;
-            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                if (doc.requestFullscreen) {
-                    doc.requestFullscreen().catch(() => {});
-                } else if (doc.webkitRequestFullscreen) {
-                    doc.webkitRequestFullscreen();
-                }
-            }
-        }
-
         // ⚙️ 設定區
         const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbx-ZuM0QX6rncNxsUcBct7CIcK89UVhgn3KOsJiPRug4NIFzTzX3LdtCUgd-546oRSJSQ/exec';
         const LINE_CHANNEL_ID = '2011007742';
@@ -358,7 +346,6 @@
         }
 
         function loginWithLine() {
-            requestFullScreenMode(); // 觸發電腦全螢幕
             const redirectUri = encodeURIComponent(GAS_API_URL);
             const lineAuthUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CHANNEL_ID}&redirect_uri=${redirectUri}&state=takaowalk&scope=profile%20openid`;
             window.location.href = lineAuthUrl;
@@ -470,9 +457,6 @@
         }
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        // 🖱️ 首次點擊網頁任意處自動請求電腦版全螢幕
-        window.addEventListener('click', requestFullScreenMode, { once: true });
 
         window.onload = initMap;
     </script>
