@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TAKAO WALK arr!</title>
     
-    <!-- 🌸 遊戲瀏覽器圖標 (logo.jpg) -->
-    <link rel="icon" href="logo.jpg" type="image/jpeg">
+    <!-- 🌸 遊戲瀏覽器圖標 (SVG 格式) -->
+    <link rel="icon" href="logo.svg" type="image/svg+xml">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -52,7 +52,8 @@
             z-index: 3000;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-end;
+            padding-bottom: max(40px, 8vh);
             background-color: #f7f5f0;
             overflow: hidden;
         }
@@ -76,7 +77,7 @@
             display: block;
         }
 
-        /* 🔘 置中內容與按鈕區塊 */
+        /* 🔘 下方按鈕區塊 */
         .login-content {
             position: relative;
             z-index: 2;
@@ -236,7 +237,7 @@
 </head>
 <body>
 
-    <!-- 🔒 滿版封面 + 正中間 LINE 登入按鈕 -->
+    <!-- 🔒 滿版封面 + 底部 LINE 登入按鈕 -->
     <div class="login-overlay" id="login-overlay">
         <picture class="bg-cover-picture">
             <!-- 橫向裝置（電腦 / 平板橫放）使用 cover_computer.jpg -->
