@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>TAKAO WALK arr!</title>
     
     <!-- 🌸 遊戲瀏覽器圖標 (SVG 格式) -->
@@ -53,7 +53,8 @@
             display: flex;
             justify-content: center;
             align-items: flex-end;
-            padding-bottom: max(40px, 8vh);
+            /* ⬆️ 向上抬高並整合 iOS 安全區域 */
+            padding-bottom: calc(11vh + env(safe-area-inset-bottom, 20px));
             background-color: #f7f5f0;
             overflow: hidden;
         }
@@ -109,7 +110,7 @@
 
         .hud-top {
             position: absolute;
-            top: 15px;
+            top: calc(15px + env(safe-area-inset-top, 0px));
             left: 50%;
             transform: translateX(-50%);
             z-index: 1000;
@@ -161,7 +162,7 @@
 
         .hud-bottom {
             position: absolute;
-            bottom: 20px;
+            bottom: calc(20px + env(safe-area-inset-bottom, 0px));
             left: 50%;
             transform: translateX(-50%);
             z-index: 1000;
