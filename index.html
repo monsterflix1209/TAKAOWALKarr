@@ -146,11 +146,11 @@
         .progress-bar-bg { width: 100%; height: 10px; background: #e9ecef; border-radius: 10px; margin-top: 10px; overflow: hidden; }
         .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--pastel-pink), var(--pastel-yellow)); border-radius: 10px; transition: width 0.5s ease; }
 
-        /* 食物能量球點位樣式 */
+        /* 食物能量球點位樣式 (針對去背 SVG 優化) */
         .food-icon-wrapper { display: flex; justify-content: center; align-items: center; cursor: pointer; }
         .food-icon-img {
-            width: 36px; height: 36px; object-fit: cover; border-radius: 50%;
-            border: 2px solid #ffffff; box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+            width: 38px; height: 38px; object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
             transition: transform 0.2s ease;
         }
         .food-icon-img:active { transform: scale(0.8); }
@@ -196,7 +196,7 @@
         }
 
         .rocket-info { display: flex; align-items: center; gap: 10px; flex: 1; }
-        .rocket-img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+        .rocket-img { width: 42px; height: 42px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.15)); }
         .rocket-text { display: flex; flex-direction: column; flex: 1; }
         .rocket-name { font-weight: 800; font-size: 0.95rem; color: #4a4e69; }
         .rocket-progress-text { font-size: 0.78rem; color: #8a817c; font-weight: 700; margin-top: 2px; }
@@ -227,7 +227,7 @@
 
         .video-overlay video {
             width: 100%; height: 100%; object-fit: cover;
-            pointer-events: none; /* 隱藏右鍵與選單選取，無視任何原生控制點選 */
+            pointer-events: none;
         }
 
         /* 🍄 皮克敏風格景點解鎖視窗 */
@@ -308,7 +308,6 @@
         }
 
         .quiz-opt-btn:active { transform: scale(0.97); background: #ffe6ea; }
-
         .quiz-opt-btn.disabled { opacity: 0.6; cursor: not-allowed; background: #f0f0f0; border-color: #ddd; }
 
         .collected-tag {
@@ -424,7 +423,7 @@
         </div>
     </div>
 
-    <!-- 🎬 影片發射過場 Overlay（徹底隱藏控制器） -->
+    <!-- 🎬 影片發射過場 Overlay -->
     <div class="video-overlay" id="video-overlay">
         <video id="rocket-video" playsinline webkit-playsinline x5-video-player-type="h5"></video>
     </div>
@@ -485,22 +484,20 @@
         let activeSpot = null;
         let offlineChecked = false;
 
-        // 🌀 雷達動畫變數
         let radarFrames = [];
         let radarFrameIndex = 0;
         let radarAnimationTimer = null;
         let preloadedRadarImages = [];
 
-        // 🍡 5 款食物能量球與火箭資料設定
+        // 🍡 5 款食物能量球圖檔（更新為 .svg）與火箭資料設定
         const foodTypes = [
-            { key: 'bu', name: '珍珠奶茶', rocketName: '珍奶一號', planetName: '珍奶星球', img: 'bu.jpg', video: 'bu.mp4' },
-            { key: 'a', name: '蚵仔煎', rocketName: '蚵仔煎一號', planetName: '蚵仔煎星球', img: 'a.jpg', video: 'a.mp4' },
-            { key: 'pork', name: '滷肉飯', rocketName: '滷肉飯一號', planetName: '滷肉飯星球', img: 'pork.jpg', video: 'pork.mp4' },
-            { key: 'xiao', name: '小籠包', rocketName: '小籠包一號', planetName: '小籠包星球', img: 'xiao.jpg', video: 'xiao.mp4' },
-            { key: 'stinky', name: '臭豆腐', rocketName: '臭豆腐一號', planetName: '臭豆腐星球', img: 'stinky.jpg', video: 'stinky.mp4' }
+            { key: 'bu', name: '珍珠奶茶', rocketName: '珍奶一號', planetName: '珍奶星球', img: 'bu.svg', video: 'bu.mp4' },
+            { key: 'a', name: '蚵仔煎', rocketName: '蚵仔煎一號', planetName: '蚵仔煎星球', img: 'a.svg', video: 'a.mp4' },
+            { key: 'pork', name: '滷肉飯', rocketName: '滷肉飯一號', planetName: '滷肉飯星球', img: 'pork.svg', video: 'pork.mp4' },
+            { key: 'xiao', name: '小籠包', rocketName: '小籠包一號', planetName: '小籠包星球', img: 'xiao.svg', video: 'xiao.mp4' },
+            { key: 'stinky', name: '臭豆腐', rocketName: '臭豆腐一號', planetName: '臭豆腐星球', img: 'stinky.svg', video: 'stinky.mp4' }
         ];
 
-        // 能量球進度數據 (預設皆為 0)
         let foodCounts = { bu: 0, a: 0, pork: 0, xiao: 0, stinky: 0 };
         let activeFoodMarkers = [];
 
@@ -576,17 +573,11 @@
             isBgmPlaying = !isBgmPlaying;
         }
 
-        // ⚡ 儲存離線狀態
         function saveOfflinePos(coords) {
-            const data = {
-                lat: coords[0],
-                lng: coords[1],
-                time: Date.now()
-            };
+            const data = { lat: coords[0], lng: coords[1], time: Date.now() };
             localStorage.setItem('takaowalk_last_pos', JSON.stringify(data));
         }
 
-        // ⚡ 離線時間與距離補算邏輯
         function checkAndApplyOfflineDistance(newCoords) {
             if (offlineChecked) return;
             offlineChecked = true;
@@ -601,7 +592,6 @@
 
                 if (timeDiffSec >= 30 && timeDiffSec <= 86400) {
                     const distMeters = getDistance(lastData.lat, lastData.lng, newCoords[0], newCoords[1]);
-
                     if (distMeters >= 10) {
                         totalDistanceMeters += distMeters;
                         const addedKm = (distMeters / 1000).toFixed(2);
@@ -621,11 +611,9 @@
             }
         });
 
-        // 🌀 雷達圖資計算
         function getPast2HoursRadarFrames() {
             const frames = [];
             const now = new Date();
-            
             let baseTime = new Date(now.getTime() - 15 * 60 * 1000);
             baseTime.setMinutes(Math.floor(baseTime.getMinutes() / 10) * 10, 0, 0);
 
@@ -647,7 +635,6 @@
 
         function startRadarAnimation() {
             stopRadarAnimation();
-
             radarFrames = getPast2HoursRadarFrames();
             radarFrameIndex = 0;
 
@@ -660,17 +647,13 @@
             const radarImg = document.getElementById('radar-img');
             const timeTag = document.getElementById('radar-time-tag');
 
-            radarImg.onerror = function() {
-                this.onerror = null;
-            };
+            radarImg.onerror = function() { this.onerror = null; };
 
             radarAnimationTimer = setInterval(() => {
                 if (radarFrames.length === 0) return;
-
                 const currentFrame = radarFrames[radarFrameIndex];
                 radarImg.src = currentFrame.url;
                 timeTag.innerText = `▶ 觀測時間：${currentFrame.timeStr} (0.1s/幀)`;
-
                 radarFrameIndex = (radarFrameIndex + 1) % radarFrames.length;
             }, 100);
         }
@@ -711,17 +694,13 @@
                 }).catch(() => { document.getElementById('road-name').innerText = `📍 搜尋路名中...`; });
         }
 
-        // 🍡 隨機生成 35+ 個美食能量球地標
         function spawnRandomFoodSpots(centerLat, centerLng) {
-            // 清除既有食物地標
             activeFoodMarkers.forEach(m => map.removeLayer(m));
             activeFoodMarkers = [];
 
-            const totalCount = 35; // 生成 35 個能量球地標
+            const totalCount = 35;
             for (let i = 0; i < totalCount; i++) {
-                const food = foodTypes[i % foodTypes.length]; // 均勻循環分配 5 種食物
-                
-                // 隨機在 80m ~ 450m 半徑範圍內撒點
+                const food = foodTypes[i % foodTypes.length];
                 const radius = 0.0008 + Math.random() * 0.0035; 
                 const angle = Math.random() * Math.PI * 2;
                 const spotLat = centerLat + radius * Math.cos(angle);
@@ -730,12 +709,11 @@
                 const foodIcon = L.divIcon({
                     className: 'food-icon-wrapper',
                     html: `<img src="${food.img}" class="food-icon-img" alt="${food.name}">`,
-                    iconSize: [36, 36], iconAnchor: [18, 18]
+                    iconSize: [38, 38], iconAnchor: [19, 19]
                 });
 
                 const marker = L.marker([spotLat, spotLng], { icon: foodIcon }).addTo(map);
                 
-                // 點擊直接採收
                 marker.on('click', () => {
                     map.removeLayer(marker);
                     foodCounts[food.key]++;
@@ -778,9 +756,7 @@
                 marker.on('click', () => openPikminModal(spot));
             });
 
-            // 初始化美食能量球地標
             spawnRandomFoodSpots(userCoords[0], userCoords[1]);
-
             checkUrlParamsAndInit();
         }
 
@@ -791,7 +767,6 @@
             }
         }
 
-        // 🚀 探險 Modal 控制與發射邏輯
         function openExploreModal() {
             renderExploreRockets();
             document.getElementById('explore-modal').style.display = 'flex';
@@ -838,23 +813,19 @@
             video.src = food.video;
             videoOverlay.style.display = 'flex';
 
-            // 強制開啟播放並暫停背景音樂
             const bgm = document.getElementById('bgm');
             if (bgm && !bgm.paused) bgm.pause();
 
             video.play().catch(e => console.log("影片自動播放被阻止", e));
 
-            // 影片播放完畢後觸發星球抵達與抽獎
             video.onended = () => {
                 videoOverlay.style.display = 'none';
                 video.src = '';
 
                 if (isBgmPlaying && bgm) bgm.play();
 
-                // 扣除 12 個能量球
                 foodCounts[foodKey] -= 12;
 
-                // 金幣抽獎機率：50% -> 1枚 / 35% -> 2枚 / 15% -> 3枚
                 const rand = Math.random();
                 let coins = 1;
                 if (rand > 0.85) coins = 3;
