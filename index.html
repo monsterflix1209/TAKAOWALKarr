@@ -20,203 +20,286 @@
         }
 
         * {
-            box-sizing: border-box; margin: 0; padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
         body, html {
-            width: 100vw; height: 100vh; height: 100dvh;
-            overflow: hidden; background-color: var(--pastel-bg);
-            color: var(--text-color); position: fixed; top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            background-color: var(--pastel-bg);
+            color: var(--text-color);
+            position: fixed;
+            top: 0;
+            left: 0;
         }
 
-        #map { width: 100vw; height: 100vh; height: 100dvh; z-index: 1; }
+        #map {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            z-index: 1;
+        }
 
+        /* 🔒 登入遮罩 */
         .login-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh;
-            z-index: 3000; display: flex; justify-content: center; align-items: flex-end;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh; height: 100dvh;
+            z-index: 3000;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
             padding-bottom: calc(15vh + env(safe-area-inset-bottom, 30px));
-            background-color: #f7f5f0; overflow: hidden;
+            background-color: #f7f5f0;
+            overflow: hidden;
         }
 
-        .bg-cover-picture { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh; z-index: 1; }
-        .bg-cover-image { width: 100vw; height: 100vh; height: 100dvh; object-fit: cover; object-position: center; }
+        .bg-cover-picture {
+            position: absolute; top: 0; left: 0;
+            width: 100vw; height: 100vh; height: 100dvh;
+            z-index: 1; display: block;
+        }
+
+        .bg-cover-image {
+            width: 100vw; height: 100vh; height: 100dvh;
+            object-fit: cover; object-position: center;
+        }
 
         .login-content {
-            position: relative; z-index: 2; width: 85%; max-width: 320px;
-            display: flex; flex-direction: column; gap: 12px; justify-content: center; align-items: center;
+            position: relative; z-index: 2;
+            width: 85%; max-width: 320px;
+            display: flex; flex-direction: column; gap: 12px;
+            justify-content: center; align-items: center;
         }
 
         .full-line-btn {
-            width: 100%; background-color: #06C755; color: white; border: none;
-            padding: 16px 24px; border-radius: 30px; font-weight: 800; font-size: 1.1rem;
-            cursor: pointer; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35); transition: transform 0.15s ease;
+            width: 100%; background-color: #06C755; color: white;
+            border: none; padding: 16px 24px; border-radius: 30px;
+            font-weight: 800; font-size: 1.1rem; cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+            transition: transform 0.15s ease;
         }
         .full-line-btn:active { transform: scale(0.96); }
 
         .test-skip-btn {
-            width: 100%; background-color: rgba(255, 255, 255, 0.9); color: #5c544d;
-            border: 2px dashed #ff758c; padding: 12px 20px; border-radius: 30px;
-            font-weight: 800; font-size: 0.95rem; cursor: pointer; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            width: 100%; background-color: rgba(255, 255, 255, 0.9);
+            color: #5c544d; border: 2px dashed #ff758c; padding: 12px 20px;
+            border-radius: 30px; font-weight: 800; font-size: 0.95rem; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
         }
+        .test-skip-btn:active { transform: scale(0.96); }
 
+        /* HUD 介面 */
         .hud-top {
-            position: absolute; top: calc(12px + env(safe-area-inset-top, 0px));
-            left: 50%; transform: translateX(-50%); z-index: 1000; width: 94%; max-width: 480px;
-            background: var(--pastel-card); backdrop-filter: blur(8px); padding: 8px 12px;
-            border-radius: 20px; box-shadow: 0 8px 20px rgba(180, 160, 150, 0.15);
-            border: 2px solid #ffffff; display: flex; justify-content: space-between; align-items: center;
+            position: absolute;
+            top: calc(15px + env(safe-area-inset-top, 0px));
+            left: 50%; transform: translateX(-50%);
+            z-index: 1000; width: 92%; max-width: 440px;
+            background: var(--pastel-card); backdrop-filter: blur(8px);
+            padding: 10px 14px; border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(180, 160, 150, 0.15);
+            border: 2px solid #ffffff;
+            display: flex; justify-content: space-between; align-items: center;
         }
 
-        .brand-container { display: flex; flex-direction: column; align-items: flex-start; max-width: 55%; }
-        .brand-title { font-weight: 800; font-size: 0.9rem; color: #ff758c; }
-        .road-name { 
-            font-size: 0.72rem; color: #e63946; font-weight: 700; margin-top: 1px; 
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; 
-        }
+        .brand-container { display: flex; flex-direction: column; align-items: flex-start; }
+        .brand-title { font-weight: 800; font-size: 0.95rem; color: #ff758c; }
+        .road-name { font-size: 0.7rem; color: #e63946; font-weight: 700; margin-top: 2px; max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .action-tools { display: flex; gap: 6px; align-items: center; flex-wrap: nowrap; }
+        .action-tools { display: flex; gap: 6px; align-items: center; }
 
         .icon-btn {
             background: #ffffff; border: 1.5px solid #ffccd5; border-radius: 12px;
             padding: 6px 10px; display: flex; align-items: center; justify-content: center;
-            font-size: 1rem; cursor: pointer;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06); transition: transform 0.1s; white-space: nowrap;
+            font-size: 0.8rem; font-weight: 800; color: #5c544d; cursor: pointer;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06); transition: transform 0.1s;
         }
         .icon-btn:active { transform: scale(0.92); }
-        .icon-btn.rocket-btn { background: #ffe5ec; border-color: #ff4d6d; }
 
         .dist-tracker {
-            font-size: 0.75rem; background: #fff0f3; padding: 6px 8px; border-radius: 10px;
-            color: #ff4d6d; font-weight: 800; border: 1px solid #ffccd5; white-space: nowrap;
+            font-size: 0.8rem; background: #fff0f3; padding: 5px 10px;
+            border-radius: 12px; color: #ff4d6d; font-weight: 800; border: 1px solid #ffccd5;
         }
 
         .hud-bottom {
-            position: absolute; bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-            left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 420px;
-            background: var(--pastel-card); backdrop-filter: blur(8px); padding: 14px 16px;
-            border-radius: 24px; box-shadow: 0 10px 25px rgba(180, 160, 150, 0.18);
+            position: absolute;
+            bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+            left: 50%; transform: translateX(-50%);
+            z-index: 1000; width: 90%; max-width: 420px;
+            background: var(--pastel-card); backdrop-filter: blur(8px);
+            padding: 16px; border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(180, 160, 150, 0.18);
             border: 2px solid #ffffff; text-align: center;
         }
 
-        .target-title { font-size: 0.8rem; color: #8a817c; margin-bottom: 2px; }
-        .target-name { font-size: 1.15rem; font-weight: 800; color: #4a4e69; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .target-dist { font-size: 0.9rem; color: #ff7f50; font-weight: 700; }
+        .target-title { font-size: 0.85rem; color: #8a817c; margin-bottom: 4px; }
+        .target-name { font-size: 1.25rem; font-weight: 800; color: #4a4e69; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .target-dist { font-size: 0.95rem; color: #ff7f50; font-weight: 700; }
 
-        .progress-bar-bg { width: 100%; height: 10px; background: #e9ecef; border-radius: 10px; margin-top: 8px; overflow: hidden; }
+        .progress-bar-bg { width: 100%; height: 10px; background: #e9ecef; border-radius: 10px; margin-top: 10px; overflow: hidden; }
         .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--pastel-pink), var(--pastel-yellow)); border-radius: 10px; transition: width 0.5s ease; }
 
-        /* 📍 能量球地標樣式 */
-        .food-icon-wrapper { display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1500 !important; }
-        .food-badge {
-            width: 44px; height: 44px; background: #ffffff; border: 2.5px solid #ffb7c5;
-            border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25); transition: transform 0.15s ease;
-            animation: float 2s infinite ease-in-out;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-        .food-badge:active { transform: scale(0.85); }
-        .food-icon-img { width: 28px; height: 28px; object-fit: contain; }
+        .coin-icon-wrapper { display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .coin-icon-img { width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); transition: transform 0.2s; }
+        .coin-icon-img:active { transform: scale(0.85); }
+        .hud-coin-img { width: 22px; height: 22px; object-fit: contain; }
 
         .player-avatar {
-            width: 24px; height: 24px; background-color: #3a86ff; border: 3px solid #ffffff;
-            border-radius: 50%; box-shadow: 0 0 12px rgba(58, 134, 255, 0.6); animation: pulse 1.8s infinite;
+            width: 24px; height: 24px; background-color: #3a86ff;
+            border: 3px solid #ffffff; border-radius: 50%;
+            box-shadow: 0 0 12px rgba(58, 134, 255, 0.6); animation: pulse 1.8s infinite;
         }
+
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(58, 134, 255, 0.6); }
             70% { box-shadow: 0 0 0 14px rgba(58, 134, 255, 0); }
             100% { box-shadow: 0 0 0 0 rgba(58, 134, 255, 0); }
         }
 
-        .explore-modal, .radar-modal {
+        /* 🍄 皮克敏風格景點解鎖視窗 */
+        .pikmin-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh;
-            z-index: 2900; background: rgba(20, 20, 25, 0.65); backdrop-filter: blur(6px);
+            z-index: 2500; background: rgba(20, 20, 25, 0.65); backdrop-filter: blur(6px);
             justify-content: center; align-items: flex-end;
         }
 
-        .explore-card, .radar-card {
-            width: 100%; max-width: 480px; max-height: 85vh; max-height: 85dvh; background: #ffffff;
-            border-radius: 28px 28px 0 0; display: flex; flex-direction: column; padding: 20px;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.3); overflow-y: auto;
+        .pikmin-card {
+            width: 100%; max-width: 460px; height: 88vh; height: 88dvh;
+            background: linear-gradient(180deg, #fff3f5 0%, #ffffff 40%);
+            border-radius: 32px 32px 0 0; display: flex; flex-direction: column;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3); overflow: hidden;
+            animation: slideUp 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
         }
 
-        .explore-header, .radar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .explore-title { font-size: 1.2rem; font-weight: 800; color: #ff4d6d; }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .pikmin-top-stage {
+            flex: 1.2; position: relative; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            background: radial-gradient(circle, rgba(255,235,238,1) 0%, rgba(255,255,255,0) 70%);
+            padding: 20px;
+        }
+
+        .pikmin-close-btn {
+            position: absolute; top: 20px; right: 20px; width: 36px; height: 36px;
+            background: rgba(255, 255, 255, 0.9); border: none; border-radius: 50%;
+            font-size: 1.2rem; font-weight: bold; color: #5c544d; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center;
+            z-index: 10;
+        }
+
+        .pikmin-coin-display {
+            width: 160px; height: 160px; object-fit: contain;
+            filter: drop-shadow(0 15px 25px rgba(255, 117, 140, 0.35));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(3deg); }
+        }
+
+        .pikmin-bottom-sheet {
+            background: #ffffff; padding: 24px; border-radius: 30px 30px 0 0;
+            box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.05); border-top: 1px solid #ffeef0;
+            display: flex; flex-direction: column; gap: 12px;
+        }
+
+        .pikmin-spot-title { font-size: 1.4rem; font-weight: 800; color: #4a4e69; text-align: center; }
+        .pikmin-spot-desc { font-size: 0.9rem; color: #8a817c; text-align: center; margin-bottom: 4px; }
+        
+        .pikmin-dist-badge {
+            align-self: center; background: #fff0f3; color: #ff4d6d;
+            font-weight: 700; font-size: 0.82rem; padding: 5px 14px; border-radius: 20px;
+            border: 1px solid #ffccd5;
+        }
+
+        .quiz-container {
+            background: #faf8f5; border-radius: 20px; padding: 16px;
+            border: 1.5px dashed #ffd3b6; margin-top: 6px;
+        }
+
+        .quiz-q-title { font-size: 0.95rem; font-weight: 800; color: #5c544d; margin-bottom: 12px; line-height: 1.4; text-align: center; }
+        .quiz-options-group { display: flex; flex-direction: column; gap: 10px; }
+
+        .quiz-opt-btn {
+            width: 100%; padding: 14px 18px; border-radius: 18px;
+            border: 2px solid #ffccd5; background: #ffffff; color: #4a4e69;
+            font-size: 0.95rem; font-weight: 700; cursor: pointer;
+            transition: all 0.15s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            text-align: center;
+        }
+
+        .quiz-opt-btn:active { transform: scale(0.97); background: #ffe6ea; }
+
+        .quiz-opt-btn.disabled {
+            opacity: 0.6; cursor: not-allowed; background: #f0f0f0; border-color: #ddd;
+        }
+
+        .collected-tag {
+            background: #e8f5e9; color: #2e7d32; padding: 16px; border-radius: 20px;
+            font-weight: 800; text-align: center; font-size: 1rem; border: 1px solid #a5d6a7;
+        }
+
+        /* 🌀 颱風雷達迴波 Modal */
+        .radar-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh;
+            z-index: 2800; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px);
+            justify-content: center; align-items: center; padding: 20px;
+        }
+
+        .radar-card {
+            background: #ffffff; width: 100%; max-width: 400px; border-radius: 24px;
+            padding: 18px; display: flex; flex-direction: column; align-items: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3); position: relative;
+        }
+
+        .radar-header { display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 12px; }
         .radar-title { font-weight: 800; color: #023e8a; font-size: 1.05rem; }
         .radar-time { font-size: 0.75rem; color: #6c757d; margin-top: 2px; }
-
+        
         .radar-img-box {
-            width: 100%; height: 280px; background: #000; border-radius: 16px;
+            width: 100%; height: 300px; background: #000; border-radius: 16px;
             overflow: hidden; display: flex; justify-content: center; align-items: center;
+            position: relative;
         }
+
         .radar-img-box img { width: 100%; height: 100%; object-fit: contain; }
 
-        .rocket-list { display: flex; flex-direction: column; gap: 12px; }
-        .rocket-item {
-            background: #faf8f5; border: 1.5px solid #ffe3e8; border-radius: 18px;
-            padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
-        }
-        .rocket-item.launched-item { background: #f0f0f0; border-color: #ddd; opacity: 0.8; }
-
-        .rocket-info { display: flex; align-items: center; gap: 12px; flex: 1; }
-        .rocket-img {
-            width: 46px; height: 46px; object-fit: contain; background: #ffffff;
-            border-radius: 12px; padding: 4px; border: 1.5px solid #ffccd5; box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-        }
-        .rocket-text { display: flex; flex-direction: column; flex: 1; }
-        .rocket-name { font-weight: 800; font-size: 0.95rem; color: #4a4e69; }
-        .rocket-progress-text { font-size: 0.78rem; color: #8a817c; font-weight: 700; margin-top: 2px; }
-
-        .launch-btn {
-            background: #cccccc; color: #ffffff; border: none; padding: 8px 14px;
-            border-radius: 16px; font-weight: 800; font-size: 0.85rem; cursor: not-allowed;
-            transition: all 0.2s ease; white-space: nowrap;
-        }
-        .launch-btn.ready {
-            background: linear-gradient(135deg, #ff758c, #ff4d6d); cursor: pointer;
-            box-shadow: 0 4px 12px rgba(255, 77, 109, 0.4); animation: bounce 1.2s infinite alternate;
-        }
-        .launch-btn.launched { background: #b0bec5; color: white; cursor: not-allowed; animation: none; }
-
-        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-3px); } }
-
-        .close-circle-btn {
-            width: 32px; height: 32px; background: #f0f0f0; border: none;
-            border-radius: 50%; font-weight: bold; font-size: 1rem; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; color: #555;
-        }
-
-        .video-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh;
-            z-index: 5000; background: #000000; justify-content: center; align-items: center;
-        }
-        .video-overlay video { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-
-        .line-reward-btn {
-            width: 100%; background: #06C755; color: white; border: none; padding: 14px 20px;
-            border-radius: 24px; font-weight: 800; font-size: 1.05rem; cursor: pointer; margin-top: 14px;
-            box-shadow: 0 6px 18px rgba(6, 199, 85, 0.35); transition: transform 0.15s ease;
-        }
-
+        /* 通用彈窗與 Toast */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(4px); z-index: 3500;
+            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); z-index: 3500;
             justify-content: center; align-items: center;
         }
+
         .modal-content {
-            background: #ffffff; padding: 24px; border-radius: 28px; width: 85%; max-width: 360px;
-            text-align: center; box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            background: #ffffff; padding: 24px; border-radius: 28px;
+            width: 85%; max-width: 360px; text-align: center;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        .modal-btn {
+            margin-top: 16px; padding: 10px 24px; background: var(--pastel-pink);
+            color: white; border: none; border-radius: 20px; font-weight: 700;
+            font-size: 0.95rem; cursor: pointer;
         }
 
         .toast {
-            position: absolute; top: 85px; left: 50%; transform: translateX(-50%); z-index: 4000;
-            background: rgba(40, 40, 40, 0.9); color: white; padding: 10px 20px; border-radius: 20px;
-            font-size: 0.88rem; display: none; backdrop-filter: blur(4px); font-weight: 700;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2); text-align: center; white-space: nowrap;
+            position: absolute; top: 85px; left: 50%; transform: translateX(-50%);
+            z-index: 4000; background: rgba(40, 40, 40, 0.9); color: white;
+            padding: 10px 20px; border-radius: 20px; font-size: 0.88rem; display: none;
+            backdrop-filter: blur(4px); font-weight: 700; box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            text-align: center; white-space: nowrap;
         }
     </style>
 </head>
@@ -224,6 +307,7 @@
 
     <audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
 
+    <!-- 🔒 滿版登入遮罩 -->
     <div class="login-overlay" id="login-overlay">
         <picture class="bg-cover-picture">
             <source media="(orientation: landscape)" srcset="cover_computer.jpg">
@@ -238,20 +322,21 @@
 
     <div id="map"></div>
 
+    <!-- HUD 頂部列 -->
     <div class="hud-top">
         <div class="brand-container">
             <div class="brand-title" id="brand-title">🌸 冒險家</div>
             <div class="road-name" id="road-name">📍 定位中...</div>
         </div>
         <div class="action-tools">
-            <button class="icon-btn rocket-btn" onclick="openExploreModal()" title="探險">🚀</button>
-            <button class="icon-btn" id="radar-btn" onclick="openRadarModal()" title="雷達迴波">🌀</button>
-            <button class="icon-btn" id="recenter-btn" onclick="recenterMap()" title="定位">🎯</button>
+            <button class="icon-btn" id="radar-btn" onclick="openRadarModal()">🌀 雷達</button>
+            <button class="icon-btn" id="recenter-btn" onclick="recenterMap()">🎯 定位</button>
             <button class="icon-btn" id="bgm-btn" onclick="toggleBGM()">🎵</button>
             <div class="dist-tracker" id="total-walked">🚶 0.00 km</div>
         </div>
     </div>
 
+    <!-- HUD 底部列 -->
     <div class="hud-bottom">
         <div class="target-title">距離最近的冒險點</div>
         <div class="target-name" id="target-name">搜尋中...</div>
@@ -261,244 +346,193 @@
         </div>
     </div>
 
-    <div class="explore-modal" id="explore-modal" onclick="closeExploreModal(event)">
-        <div class="explore-card" onclick="event.stopPropagation()">
-            <div class="explore-header">
-                <div class="explore-title">🚀 火箭探險進度</div>
-                <button class="close-circle-btn" onclick="closeExploreModal()">✕</button>
-            </div>
-            <div class="rocket-list" id="rocket-list"></div>
-        </div>
-    </div>
-
+    <!-- 🌀 颱風雷達迴波彈窗 -->
     <div class="radar-modal" id="radar-modal" onclick="closeRadarModal(event)">
         <div class="radar-card" onclick="event.stopPropagation()">
             <div class="radar-header">
                 <div>
-                    <div class="radar-title">🌀 2小時雷達迴波動畫</div>
-                    <div class="radar-time" id="radar-time-tag">載入中...</div>
+                    <div class="radar-title">🌀 白海豚颱風 - 2小時迴波動畫 (0.1s/幀)</div>
+                    <div class="radar-time" id="radar-time-tag">播放載入中...</div>
                 </div>
-                <button class="close-circle-btn" onclick="closeRadarModal()">✕</button>
+                <button class="pikmin-close-btn" style="position:static;" onclick="closeRadarModal()">✕</button>
             </div>
             <div class="radar-img-box">
-                <img id="radar-img" alt="雷達迴波圖">
+                <img id="radar-img" alt="中央氣象署雷達迴波圖">
             </div>
         </div>
     </div>
 
-    <div class="video-overlay" id="video-overlay">
-        <video id="rocket-video" playsinline webkit-playsinline></video>
-    </div>
-
-    <div class="modal" id="coin-reward-modal">
-        <div class="modal-content">
-            <div style="font-size: 3.2rem; margin-bottom: 6px;">🪙</div>
-            <h2 id="coin-modal-title" style="color: #ff758c; margin-bottom: 8px;">獲得金幣！</h2>
-            <p id="coin-modal-desc" style="color: #6c757d; font-size: 0.92rem; line-height: 1.5;">請點擊下方按鈕前往 LINE 領取集點！</p>
-            <button id="coin-modal-link-btn" class="line-reward-btn">🟢 前往 LINE 領取集點</button>
-            <button class="modal-btn" style="background:#b0bec5; margin-top: 10px;" onclick="closeModal('coin-reward-modal')">稍後領取</button>
+    <!-- 🍄 皮克敏風格景點視窗 -->
+    <div class="pikmin-overlay" id="pikmin-modal" onclick="closePikminModal(event)">
+        <div class="pikmin-card" onclick="event.stopPropagation()">
+            <div class="pikmin-top-stage">
+                <button class="pikmin-close-btn" onclick="closePikminModal()">✕</button>
+                <img id="pikmin-coin-img" src="" alt="Spot Coin" class="pikmin-coin-display">
+            </div>
+            
+            <div class="pikmin-bottom-sheet">
+                <div class="pikmin-spot-title" id="pikmin-spot-title">景點名稱</div>
+                <div class="pikmin-spot-desc" id="pikmin-spot-desc">景點簡介說明</div>
+                <div class="pikmin-dist-badge" id="pikmin-dist-badge">📍 計算距離中...</div>
+                
+                <div class="quiz-container" id="quiz-container"></div>
+            </div>
         </div>
     </div>
 
     <div class="toast" id="toast"></div>
 
+    <div class="modal" id="win-modal">
+        <div class="modal-content">
+            <div style="font-size: 3rem; margin-bottom: 8px;">🎉</div>
+            <h2 style="color: #ff758c; margin-bottom: 8px;">任務完成！</h2>
+            <p style="color: #6c757d; font-size: 0.9rem; line-height: 1.5;">你已踏遍 TAKAO WALK arr! 所有景點！</p>
+            <button class="modal-btn" onclick="closeModal('win-modal')">太棒了！</button>
+        </div>
+    </div>
+
     <script>
-        const LINE_STAMP_URLS = { 1: 'https://u.lin.ee/XAVBp5D', 2: 'https://u.lin.ee/zdsJMfi', 3: 'https://u.lin.ee/z60aQv3' };
+        const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbx-ZuM0QX6rncNxsUcBct7CIcK89UVhgn3KOsJiPRug4NIFzTzX3LdtCUgd-546oRSJSQ/exec';
+        const LINE_CHANNEL_ID = '2011007742';
 
-        const foodTypes = [
-            { key: 'rice', name: '咕嚕飯', rocketName: '咕嚕飯一號', planetName: '咕嚕飯星球', img: 'rice.svg', video: 'rice_planet.mp4' },
-            { key: 'noodle', name: '咕唧麵', rocketName: '咕唧麵一號', planetName: '咕唧麵星球', img: 'noodle.svg', video: 'noodle_planet.mp4' },
-            { key: 'latte', name: '冰拿鐵', rocketName: '冰拿鐵一號', planetName: '冰拿鐵星球', img: 'latte.svg', video: 'latte_planet.mp4' },
-            { key: 'boba', name: '啵啵奶', rocketName: '啵啵奶一號', planetName: '啵啵奶星球', img: 'boba.svg', video: 'boba_planet.mp4' },
-            { key: 'marshmallow', name: '棉花糖', rocketName: '棉花糖一號', planetName: '棉花糖星球', img: 'marshmallow.svg', video: 'marshmallow_planet.mp4' }
+        let currentLineId = null;
+        let currentName = null;
+        let isBgmPlaying = true;
+        let lastGeocodeCoords = null;
+        let activeSpot = null;
+        let offlineChecked = false;
+
+        // 🌀 雷達動畫變數
+        let radarFrames = [];
+        let radarFrameIndex = 0;
+        let radarAnimationTimer = null;
+        let preloadedRadarImages = [];
+
+        const spots = [
+            { 
+                id: 1, name: '奇美博物館', lat: 22.9348, lng: 120.2260, desc: '西洋藝術與古典城堡建築', icon: 'coin_chimei.png', collected: false,
+                q: '奇美博物館最具代表性的建築風格接近哪一種？',
+                options: [{ text: '歐洲古典風格', isCorrect: true }, { text: '日式和風建築', isCorrect: false }]
+            },
+            { 
+                id: 2, name: '科工館', lat: 22.6405, lng: 120.3228, desc: '充滿驚奇與科幻的探索基地', icon: 'coin_science.png', collected: false,
+                q: '科工館的全名是？',
+                options: [{ text: '國立科學工藝博物館', isCorrect: true }, { text: '國立自然科學博物館', isCorrect: false }]
+            },
+            { 
+                id: 3, name: '六合夜市', lat: 22.6331, lng: 120.3002, desc: '飄香數十年的經典高雄美食地標', icon: 'coin_liuhe.png', collected: false,
+                q: '六合夜市最熱鬧的時段通常是？',
+                options: [{ text: '晚上', isCorrect: true }, { text: '清晨', isCorrect: false }]
+            },
+            { 
+                id: 4, name: '新崛江', lat: 22.6222, lng: 120.3015, desc: '潮流與時尚聚集的青藝天地', icon: 'coin_shinkuchan.png', collected: false,
+                q: '新崛江最有名的是哪一類型活動？',
+                options: [{ text: '潮流購物與美食', isCorrect: true }, { text: '登山健行', isCorrect: false }]
+            },
+            { 
+                id: 5, name: '駁二特區', lat: 22.6198, lng: 120.2818, desc: '港區倉庫改建的文創冒險樂園', icon: 'coin_pier2.png', collected: false,
+                q: '駁二藝術特區原本是什麼用途？',
+                options: [{ text: '港口倉庫', isCorrect: true }, { text: '火車車站', isCorrect: false }]
+            },
+            { 
+                id: 6, name: '哈瑪星', lat: 22.6215, lng: 120.2710, desc: '大片草地與舊鐵道的港灣時光', icon: 'coin_hamasen.png', collected: false,
+                q: '哈瑪星名稱的由來與哪一項有關？',
+                options: [{ text: '日文「濱線」鐵道', isCorrect: true }, { text: '哈瑪星天文台', isCorrect: false }]
+            },
+            { 
+                id: 7, name: 'SKM Park', lat: 22.5815, lng: 120.3300, desc: '美式樂園風的購物與遊樂天堂', icon: 'coin_skmpark.png', collected: false,
+                q: 'SKM Park 最大特色之一是？',
+                options: [{ text: '鈴鹿賽道樂園', isCorrect: true }, { text: '海洋水族館', isCorrect: false }]
+            }
         ];
-
-        // 📍 固定自訂地標（您可以在這裡擴充預設地點）
-        const presetLandmarks = [
-            { name: "高雄85大樓", lat: 22.6117, lng: 120.3003, foodKey: "rice" },
-            { name: "中央公園", lat: 22.6238, lng: 120.3013, foodKey: "marshmallow" },
-            { name: "駁二藝術特區", lat: 22.6198, lng: 120.2818, foodKey: "boba" },
-            { name: "美麗島站", lat: 22.6313, lng: 120.3018, foodKey: "latte" },
-            { name: "高雄車站", lat: 22.6380, lng: 120.3020, foodKey: "noodle" }
-        ];
-
-        let foodCounts = { rice: 0, noodle: 0, latte: 0, boba: 0, marshmallow: 0 };
-        let launchedRockets = { rice: false, noodle: false, latte: false, boba: false, marshmallow: false };
-        let activeFoodMarkers = [];
-        let loadedPlaceIds = new Set();
 
         let userCoords = [22.6250, 120.3000];
         let map, playerMarker;
         let totalDistanceMeters = 0;
         let previousPosition = null;
 
-        // 地名防抖變數
-        let lastGeocodeTime = 0;
-        let lastGeocodeCoords = null;
-
-        // 雷達變數
-        let radarFrames = [], radarFrameIndex = 0, radarAnimationTimer = null;
-        let isBgmPlaying = true;
-
-        function initMap() {
-            map = L.map('map', { zoomControl: false, attributionControl: false, minZoom: 7, maxZoom: 18 }).setView(userCoords, 16);
-            L.tileLayer('https://api.maptiler.com/maps/aquarelle-v4/256/{z}/{x}/{y}.png?key=DDhwtFjCbEWiteavezOK', { minZoom: 7, maxZoom: 18 }).addTo(map);
-
-            const playerIcon = L.divIcon({
-                className: 'player-marker',
-                html: '<div class="player-avatar"></div>',
-                iconSize: [24, 24], iconAnchor: [12, 12]
-            });
-            playerMarker = L.marker(userCoords, { icon: playerIcon }).addTo(map);
-
-            // 載入固定預設地標
-            initPresetLandmarks();
-
-            checkUrlParamsAndInit();
-        }
-
-        // 📍 載入預設定標
-        function initPresetLandmarks() {
-            presetLandmarks.forEach(item => {
-                spawnFoodAtLocation(item.lat, item.lng, item.name, item.foodKey);
+        function tryAutoPlayBGM() {
+            const bgm = document.getElementById('bgm');
+            const btn = document.getElementById('bgm-btn');
+            if (!bgm) return;
+            bgm.volume = 0.08;
+            bgm.play().then(() => {
+                isBgmPlaying = true;
+                if (btn) btn.innerText = '🎵';
+            }).catch(() => {
+                const unlockAudio = () => {
+                    bgm.play();
+                    isBgmPlaying = true;
+                    if (btn) btn.innerText = '🎵';
+                    document.removeEventListener('click', unlockAudio);
+                    document.removeEventListener('touchstart', unlockAudio);
+                };
+                document.addEventListener('click', unlockAudio);
+                document.addEventListener('touchstart', unlockAudio);
             });
         }
 
-        // 📍 逆地理編碼：格式改回「縣市 鄉鎮市區 路名/街/巷」
-        async function fetchRoadName(lat, lng) {
-            const now = Date.now();
-            
-            // 防抖：10秒間隔
-            if (now - lastGeocodeTime < 10000) return;
-            
-            // 距離限制：移動超過25m才請求
-            if (lastGeocodeCoords && getDistance(lastGeocodeCoords[0], lastGeocodeCoords[1], lat, lng) < 25) return;
+        function toggleBGM() {
+            const bgm = document.getElementById('bgm');
+            const btn = document.getElementById('bgm-btn');
+            if (isBgmPlaying) { bgm.pause(); btn.innerText = '🔇'; }
+            else { bgm.volume = 0.08; bgm.play(); btn.innerText = '🎵'; }
+            isBgmPlaying = !isBgmPlaying;
+        }
 
-            lastGeocodeTime = now;
-            lastGeocodeCoords = [lat, lng];
+        // ⚡ 儲存離線狀態
+        function saveOfflinePos(coords) {
+            const data = {
+                lat: coords[0],
+                lng: coords[1],
+                time: Date.now()
+            };
+            localStorage.setItem('takaowalk_last_pos', JSON.stringify(data));
+        }
+
+        // ⚡ 離線時間與距離補算邏輯（包含搭車/開車）
+        function checkAndApplyOfflineDistance(newCoords) {
+            if (offlineChecked) return;
+            offlineChecked = true;
+
+            const lastDataRaw = localStorage.getItem('takaowalk_last_pos');
+            if (!lastDataRaw) return;
 
             try {
-                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=zh-TW`);
-                const data = await res.json();
-                
-                if (data && data.address) {
-                    const a = data.address;
-                    
-                    // 組合：縣市 鄉鎮市區 路名
-                    const city = a.city || a.county || a.state || '';
-                    const district = a.suburb || a.town || a.district || a.city_district || '';
-                    const road = a.road || a.pedestrian || a.street || a.village || '';
+                const lastData = JSON.parse(lastDataRaw);
+                const now = Date.now();
+                const timeDiffSec = (now - lastData.time) / 1000;
 
-                    const fullAddress = `${city} ${district} ${road}`.trim();
-                    document.getElementById('road-name').innerText = `📍 ${fullAddress || '探索區域'}`;
+                // 條件：離線時間介於 30 秒至 24 小時之間
+                if (timeDiffSec >= 30 && timeDiffSec <= 86400) {
+                    const distMeters = getDistance(lastData.lat, lastData.lng, newCoords[0], newCoords[1]);
+
+                    // 不限制移動速度，只要移動超過 10 公尺皆採計
+                    if (distMeters >= 10) {
+                        totalDistanceMeters += distMeters;
+                        const addedKm = (distMeters / 1000).toFixed(2);
+                        showToast(`🚗 歡迎回來！離線期間為您採計了 ${addedKm} km！`);
+                        saveLocalState();
+                        syncDataToGAS();
+                    }
                 }
-            } catch (err) {
-                console.error('地名取得失敗', err);
+            } catch (e) {
+                console.error('離線距離計算失敗', e);
             }
         }
 
-        function updatePlayerPosition(coords) {
-            userCoords = coords;
-
-            // 1. 抓取完整地名
-            fetchRoadName(coords[0], coords[1]);
-
-            // 2. 隨時保底周圍生成能量球（確保畫面上一定有）
-            generateNearbyRandomFoods(coords[0], coords[1]);
-
-            // 3. 計算里程與移動
-            if (previousPosition) {
-                const moved = getDistance(previousPosition[0], previousPosition[1], coords[0], coords[1]);
-                if (moved >= 3) {
-                    totalDistanceMeters += moved;
-                    previousPosition = coords;
-                }
-            } else {
-                previousPosition = coords;
-                map.panTo(coords);
+        // 離線狀態監聽：視頁面關閉或背景時主動儲存位置
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden' && userCoords) {
+                saveOfflinePos(userCoords);
             }
+        });
 
-            playerMarker.setLatLng(coords);
-            document.getElementById('total-walked').innerText = `🚶 ${(totalDistanceMeters / 1000).toFixed(2)} km`;
-            
-            // 4. 更新下方的最近目標距離
-            updateNearestFoodDistance();
-        }
-
-        // 📍 保底機制：在玩家四周隨機生成能量球（防止網路/API失敗無球可拿）
-        function generateNearbyRandomFoods(lat, lng) {
-            if (activeFoodMarkers.length >= 8) return; // 保持地圖上有 8 個點以上
-
-            const countToSpawn = 8 - activeFoodMarkers.length;
-            for (let i = 0; i < countToSpawn; i++) {
-                // 在周圍 100 ~ 300 公尺生成
-                const rLat = lat + (Math.random() - 0.5) * 0.005;
-                const rLng = lng + (Math.random() - 0.5) * 0.005;
-                const randomFood = foodTypes[Math.floor(Math.random() * foodTypes.length)];
-                
-                spawnFoodAtLocation(rLat, rLng, `${randomFood.name}點`, randomFood.key);
-            }
-        }
-
-        function spawnFoodAtLocation(lat, lng, shopName, foodKey) {
-            const food = foodTypes.find(f => f.key === foodKey);
-            if (!food) return;
-
-            const foodIcon = L.divIcon({
-                className: 'food-icon-wrapper',
-                html: `<div class="food-badge" title="${shopName}"><img src="${food.img}" class="food-icon-img" alt="${food.name}"></div>`,
-                iconSize: [44, 44], iconAnchor: [22, 22]
-            });
-
-            const marker = L.marker([lat, lng], { icon: foodIcon }).addTo(map);
-            marker.foodData = { lat, lng, shopName, foodKey, foodName: food.name };
-
-            marker.on('click', () => {
-                map.removeLayer(marker);
-                activeFoodMarkers = activeFoodMarkers.filter(m => m !== marker);
-                foodCounts[foodKey] = (foodCounts[foodKey] || 0) + 1;
-                showToast(`🎉 於【${shopName}】採集 1 個【${food.name}能量球】！`);
-
-                updateNearestFoodDistance();
-                if (document.getElementById('explore-modal').style.display === 'flex') renderExploreRockets();
-            });
-
-            activeFoodMarkers.push(marker);
-            updateNearestFoodDistance();
-        }
-
-        function updateNearestFoodDistance() {
-            if (!userCoords || activeFoodMarkers.length === 0) {
-                document.getElementById('target-name').innerText = '搜尋中...';
-                document.getElementById('target-dist').innerText = '-- m';
-                return;
-            }
-
-            let minDist = Infinity;
-            let nearestFood = null;
-
-            activeFoodMarkers.forEach(m => {
-                const dist = getDistance(userCoords[0], userCoords[1], m.foodData.lat, m.foodData.lng);
-                if (dist < minDist) {
-                    minDist = dist;
-                    nearestFood = m.foodData;
-                }
-            });
-
-            if (nearestFood) {
-                document.getElementById('target-name').innerHTML = `📍 ${nearestFood.shopName} (${nearestFood.foodName})`;
-                document.getElementById('target-dist').innerText = `${minDist} m`;
-                
-                // 更新進度條 (預設 300 公尺為滿格)
-                const pct = Math.max(0, Math.min(100, (1 - minDist / 300) * 100));
-                document.getElementById('progress-fill').style.width = `${pct}%`;
-            }
-        }
-
-        /* 🌀 雷達迴波 */
+        // 🌀 雷達圖資計算
         function getPast2HoursRadarFrames() {
             const frames = [];
             const now = new Date();
+            
             let baseTime = new Date(now.getTime() - 15 * 60 * 1000);
             baseTime.setMinutes(Math.floor(baseTime.getMinutes() / 10) * 10, 0, 0);
 
@@ -510,107 +544,281 @@
                 const HH = String(t.getHours()).padStart(2, '0');
                 const mm = String(t.getMinutes()).padStart(2, '0');
 
-                frames.push({
-                    url: `https://www.cwa.gov.tw/Data/radar/CV1_3600_${YYYY}${MM}${DD}${HH}${mm}.png`,
-                    timeStr: `${YYYY}-${MM}-${DD} ${HH}:${mm}`
-                });
+                const timeString = `${YYYY}-${MM}-${DD} ${HH}:${mm}`;
+                const imgUrl = `https://www.cwa.gov.tw/Data/radar/CV1_3600_${YYYY}${MM}${DD}${HH}${mm}.png`;
+
+                frames.push({ url: imgUrl, timeStr: timeString });
             }
             return frames;
         }
 
         function startRadarAnimation() {
             stopRadarAnimation();
+
             radarFrames = getPast2HoursRadarFrames();
             radarFrameIndex = 0;
+
+            preloadedRadarImages = radarFrames.map(frame => {
+                const img = new Image();
+                img.src = frame.url;
+                return img;
+            });
 
             const radarImg = document.getElementById('radar-img');
             const timeTag = document.getElementById('radar-time-tag');
 
+            radarImg.onerror = function() {
+                this.onerror = null;
+            };
+
             radarAnimationTimer = setInterval(() => {
                 if (radarFrames.length === 0) return;
+
                 const currentFrame = radarFrames[radarFrameIndex];
                 radarImg.src = currentFrame.url;
-                timeTag.innerText = `▶ 時間：${currentFrame.timeStr}`;
+                timeTag.innerText = `▶ 觀測時間：${currentFrame.timeStr} (0.1s/幀)`;
+
                 radarFrameIndex = (radarFrameIndex + 1) % radarFrames.length;
-            }, 150);
+            }, 100);
         }
 
         function stopRadarAnimation() {
-            if (radarAnimationTimer) { clearInterval(radarAnimationTimer); radarAnimationTimer = null; }
+            if (radarAnimationTimer) {
+                clearInterval(radarAnimationTimer);
+                radarAnimationTimer = null;
+            }
         }
 
-        function openRadarModal() { startRadarAnimation(); document.getElementById('radar-modal').style.display = 'flex'; }
-        function closeRadarModal(e) { if (e && e.target !== e.currentTarget && !e.target.classList.contains('close-circle-btn')) return; stopRadarAnimation(); document.getElementById('radar-modal').style.display = 'none'; }
+        function openRadarModal() {
+            startRadarAnimation();
+            document.getElementById('radar-modal').style.display = 'flex';
+        }
 
-        function openExploreModal() { renderExploreRockets(); document.getElementById('explore-modal').style.display = 'flex'; }
-        function closeExploreModal(e) { if (e && e.target !== e.currentTarget) return; document.getElementById('explore-modal').style.display = 'none'; }
+        function closeRadarModal(e) {
+            if (e && e.target !== e.currentTarget && !e.target.classList.contains('pikmin-close-btn')) return;
+            stopRadarAnimation();
+            document.getElementById('radar-modal').style.display = 'none';
+        }
 
-        function renderExploreRockets() {
-            const listEl = document.getElementById('rocket-list');
-            listEl.innerHTML = foodTypes.map(food => {
-                const count = foodCounts[food.key] || 0;
-                const isLaunched = launchedRockets[food.key] === true;
-                const isReady = !isLaunched && count >= 12;
+        function fetchRoadName(lat, lng) {
+            if (lastGeocodeCoords && getDistance(lastGeocodeCoords[0], lastGeocodeCoords[1], lat, lng) < 30) return;
+            lastGeocodeCoords = [lat, lng];
 
-                let statusText = `⚡ 能量：${count} / 12`;
-                let btnText = '充能中', btnClass = 'launch-btn';
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=zh-TW`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.address) {
+                        const addr = data.address;
+                        const city = addr.city || addr.county || addr.state || '';
+                        const district = addr.suburb || addr.town || addr.district || addr.city_district || addr.village || '';
+                        const road = addr.road || addr.pedestrian || addr.street || addr.neighbourhood || '';
+                        const fullAddress = [city, district, road].filter(Boolean).join(' ');
+                        document.getElementById('road-name').innerText = fullAddress ? `📍 ${fullAddress}` : '📍 高雄探索中';
+                    }
+                }).catch(() => { document.getElementById('road-name').innerText = `📍 搜尋路名中...`; });
+        }
 
-                if (isLaunched) { statusText = `🚀 已完成太空探險`; btnText = '已發射'; btnClass = 'launch-btn launched'; }
-                else if (isReady) { statusText = `⚡ 能量已滿（12/12）`; btnText = '🚀 發射'; btnClass = 'launch-btn ready'; }
+        function initMap() {
+            const taiwanBounds = L.latLngBounds(L.latLng(20.5, 118.0), L.latLng(26.5, 124.0));
 
-                return `
-                    <div class="rocket-item ${isLaunched ? 'launched-item' : ''}">
-                        <div class="rocket-info">
-                            <img src="${food.img}" class="rocket-img" alt="${food.name}">
-                            <div class="rocket-text">
-                                <div class="rocket-name">${food.rocketName} (${food.name})</div>
-                                <div class="rocket-progress-text">${statusText}</div>
-                            </div>
-                        </div>
-                        <button class="${btnClass}" onclick="${isReady ? `launchRocket('${food.key}')` : ''}" ${!isReady ? 'disabled' : ''}>${btnText}</button>
+            map = L.map('map', {
+                zoomControl: false, attributionControl: false,
+                minZoom: 7, maxZoom: 18,
+                maxBounds: taiwanBounds, maxBoundsViscosity: 1.0
+            }).setView(userCoords, 16);
+
+            L.tileLayer('https://api.maptiler.com/maps/aquarelle-v4/256/{z}/{x}/{y}.png?key=DDhwtFjCbEWiteavezOK', {
+                minZoom: 7, maxZoom: 18, noWrap: true
+            }).addTo(map);
+
+            const playerIcon = L.divIcon({
+                className: 'player-marker',
+                html: '<div class="player-avatar"></div>',
+                iconSize: [24, 24], iconAnchor: [12, 12]
+            });
+            playerMarker = L.marker(userCoords, { icon: playerIcon }).addTo(map);
+
+            spots.forEach(spot => {
+                const icon = L.divIcon({
+                    className: 'coin-icon-wrapper', 
+                    html: `<img src="${spot.icon}" class="coin-icon-img" alt="${spot.name}">`,
+                    iconSize: [38, 38], iconAnchor: [19, 19]
+                });
+                const marker = L.marker([spot.lat, spot.lng], { icon: icon }).addTo(map);
+                marker.on('click', () => openPikminModal(spot));
+            });
+
+            checkUrlParamsAndInit();
+        }
+
+        function recenterMap() {
+            if (map && userCoords) {
+                map.flyTo(userCoords, 16, { animate: true, duration: 0.8 });
+                showToast('🎯 已回到目前定位點');
+            }
+        }
+
+        function openPikminModal(spot) {
+            activeSpot = spot;
+            document.getElementById('pikmin-coin-img').src = spot.icon;
+            document.getElementById('pikmin-spot-title').innerText = spot.name;
+            document.getElementById('pikmin-spot-desc').innerText = spot.desc;
+            renderPikminQuiz();
+            document.getElementById('pikmin-modal').style.display = 'flex';
+        }
+
+        function closePikminModal(e) {
+            if (e && e.target !== e.currentTarget && !e.target.classList.contains('pikmin-close-btn')) return;
+            document.getElementById('pikmin-modal').style.display = 'none';
+            activeSpot = null;
+        }
+
+        function renderPikminQuiz() {
+            if (!activeSpot) return;
+
+            const dist = getDistance(userCoords[0], userCoords[1], activeSpot.lat, activeSpot.lng);
+            const badge = document.getElementById('pikmin-dist-badge');
+            const container = document.getElementById('quiz-container');
+
+            badge.innerText = dist > 1000 ? `📍 距離 ${(dist/1000).toFixed(1)} km` : `📍 距離 ${dist} m`;
+
+            if (activeSpot.collected) {
+                container.innerHTML = `<div class="collected-tag">✨ 已成功回答並領取金幣！</div>`;
+                return;
+            }
+
+            const shuffledOptions = [...activeSpot.options].sort(() => Math.random() - 0.5);
+
+            if (dist <= 50) {
+                container.innerHTML = `
+                    <div class="quiz-q-title">❓ ${activeSpot.q}</div>
+                    <div class="quiz-options-group">
+                        ${shuffledOptions.map(opt => `
+                            <button class="quiz-opt-btn" onclick="submitAnswer(${opt.isCorrect})">${opt.text}</button>
+                        `).join('')}
                     </div>
                 `;
-            }).join('');
+            } else {
+                container.innerHTML = `
+                    <div class="quiz-q-title">❓ ${activeSpot.q}</div>
+                    <div class="quiz-options-group">
+                        ${shuffledOptions.map(opt => `
+                            <button class="quiz-opt-btn disabled" disabled>${opt.text}</button>
+                        `).join('')}
+                    </div>
+                    <div style="color: #ff4d6d; font-size: 0.8rem; font-weight: 700; text-align: center; margin-top: 10px;">
+                        🚶 請靠近至 50 公尺內（目前 ${dist}m）才能答題領取金幣！
+                    </div>
+                `;
+            }
         }
 
-        function launchRocket(foodKey) {
-            const food = foodTypes.find(f => f.key === foodKey);
-            if (!food || launchedRockets[foodKey] || (foodCounts[foodKey] || 0) < 12) return;
+        function submitAnswer(isCorrect) {
+            if (!activeSpot) return;
 
-            closeExploreModal();
-            const videoOverlay = document.getElementById('video-overlay');
-            const video = document.getElementById('rocket-video');
+            const dist = getDistance(userCoords[0], userCoords[1], activeSpot.lat, activeSpot.lng);
+            if (dist > 50) {
+                showToast('🚶 您距離太遠囉！請靠近至 50m 內再試！');
+                return;
+            }
 
-            video.src = food.video;
-            videoOverlay.style.display = 'flex';
-            video.play().catch(e => console.log("影片播放限制", e));
+            if (isCorrect) {
+                activeSpot.collected = true;
+                showToast(`🎉 答對了！成功領取 ${activeSpot.name} 金幣！`);
+                saveLocalState();
+                syncDataToGAS();
+                updateProgressUI();
+                renderPikminQuiz();
+            } else {
+                showToast('❌ 答錯囉，再想看看！');
+            }
+        }
 
-            video.onended = () => {
-                videoOverlay.style.display = 'none';
-                video.src = '';
-                foodCounts[foodKey] -= 12;
-                launchedRockets[foodKey] = true;
+        function loginWithLine() {
+            tryAutoPlayBGM();
+            const redirectUri = encodeURIComponent(GAS_API_URL);
+            const lineAuthUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CHANNEL_ID}&redirect_uri=${redirectUri}&state=takaowalk&scope=profile%20openid`;
+            window.location.href = lineAuthUrl;
+        }
 
-                const rand = Math.random();
-                let coins = rand > 0.85 ? 3 : (rand > 0.50 ? 2 : 1);
-                showCoinRewardModal(coins, `🪐 發射【${food.rocketName}】抵達【${food.planetName}】！`);
+        function skipLoginForTesting() {
+            tryAutoPlayBGM();
+            localStorage.removeItem('takaowalk_user');
+            localStorage.removeItem('takaowalk_last_pos');
+            
+            document.getElementById('login-overlay').style.display = 'none';
+            currentLineId = 'test_guest';
+            currentName = '測試玩家';
+            document.getElementById('brand-title').innerText = `🌸 ${currentName}`;
+            totalDistanceMeters = 0;
+            document.getElementById('total-walked').innerText = `🚶 0.00 km`;
+            
+            updateProgressUI();
+            startGeolocation();
+            showToast('⚡ 已進入測試模式（重新整理即可回到登入頁）');
+        }
+
+        function checkUrlParamsAndInit() {
+            tryAutoPlayBGM();
+            const params = new URLSearchParams(window.location.search);
+
+            if (params.has('line_id')) {
+                currentLineId = params.get('line_id');
+                currentName = params.get('name') || '冒險家';
+                const savedDist = parseFloat(params.get('dist') || '0');
+                const savedSpots = (params.get('spots') || '').split(',');
+
+                totalDistanceMeters = savedDist * 1000;
+                spots.forEach(s => { if (savedSpots.includes(s.id.toString())) s.collected = true; });
+
+                saveLocalState();
+                window.history.replaceState({}, document.title, window.location.pathname);
+                enterGameUI();
+            } else {
+                const cachedUser = localStorage.getItem('takaowalk_user');
+                if (cachedUser) {
+                    const userData = JSON.parse(cachedUser);
+                    if (userData.lineId && userData.lineId !== 'test_guest') {
+                        currentLineId = userData.lineId;
+                        currentName = userData.name;
+                        totalDistanceMeters = userData.distMeters || 0;
+                        if (userData.collectedSpots) {
+                            spots.forEach(s => { if (userData.collectedSpots.includes(s.id)) s.collected = true; });
+                        }
+                        enterGameUI();
+                        return;
+                    }
+                }
+                document.getElementById('login-overlay').style.display = 'flex';
+            }
+        }
+
+        function saveLocalState() {
+            if (!currentLineId || currentLineId === 'test_guest') return;
+            const collectedIds = spots.filter(s => s.collected).map(s => s.id);
+            const userCache = {
+                lineId: currentLineId,
+                name: currentName,
+                distMeters: totalDistanceMeters,
+                collectedSpots: collectedIds
             };
+            localStorage.setItem('takaowalk_user', JSON.stringify(userCache));
         }
 
-        function showCoinRewardModal(coins, titleMsg) {
-            const modal = document.getElementById('coin-reward-modal');
-            document.getElementById('coin-modal-title').innerText = titleMsg || `🎉 獲得 ${coins} 枚金幣！`;
-            document.getElementById('coin-modal-desc').innerHTML = `恭喜您獲得 <b>${coins} 枚金幣獎勵</b>！<br>請點擊下方按鈕直接連線至 LINE 領取集點！`;
-            document.getElementById('coin-modal-link-btn').onclick = () => { window.location.href = LINE_STAMP_URLS[coins] || LINE_STAMP_URLS[1]; };
-            modal.style.display = 'flex';
+        function enterGameUI() {
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('brand-title').innerText = `🌸 ${currentName}`;
+            document.getElementById('total-walked').innerText = `🚶 ${(totalDistanceMeters / 1000).toFixed(2)} km`;
+            updateProgressUI();
+            startGeolocation();
         }
 
-        function toggleBGM() {
-            const bgm = document.getElementById('bgm');
-            const btn = document.getElementById('bgm-btn');
-            if (isBgmPlaying) { bgm.pause(); btn.innerText = '🔇'; }
-            else { bgm.volume = 0.08; bgm.play(); btn.innerText = '🎵'; }
-            isBgmPlaying = !isBgmPlaying;
+        function syncDataToGAS() {
+            if (!currentLineId || currentLineId === 'test_guest') return;
+            const collectedSpotIds = spots.filter(s => s.collected).map(s => s.id).join(',');
+            const km = (totalDistanceMeters / 1000).toFixed(2);
+            const url = `${GAS_API_URL}?action=updateData&line_id=${encodeURIComponent(currentLineId)}&dist=${km}&spots=${encodeURIComponent(collectedSpotIds)}`;
+            fetch(url, { mode: 'no-cors' });
         }
 
         function getDistance(lat1, lon1, lat2, lon2) {
@@ -621,29 +829,75 @@
             return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
         }
 
+        function updatePlayerPosition(coords) {
+            userCoords = coords;
+
+            // 首次定位觸發離線距離補算
+            checkAndApplyOfflineDistance(coords);
+
+            // 當前持續記錄最新座標與時間標記
+            saveOfflinePos(coords);
+
+            if (previousPosition) {
+                const moved = getDistance(previousPosition[0], previousPosition[1], coords[0], coords[1]);
+                if (moved >= 3) {
+                    totalDistanceMeters += moved;
+                    previousPosition = coords;
+                    saveLocalState();
+                    syncDataToGAS();
+                }
+            } else {
+                previousPosition = coords;
+                map.panTo(coords);
+            }
+
+            fetchRoadName(coords[0], coords[1]);
+
+            const walkedEl = document.getElementById('total-walked');
+            if (walkedEl) walkedEl.innerText = `🚶 ${(totalDistanceMeters / 1000).toFixed(2)} km`;
+
+            playerMarker.setLatLng(coords);
+
+            let nearest = null, minDist = Infinity;
+            spots.forEach(spot => {
+                const dist = getDistance(coords[0], coords[1], spot.lat, spot.lng);
+                if (dist < minDist) { minDist = dist; nearest = spot; }
+            });
+
+            if (nearest) {
+                document.getElementById('target-name').innerHTML = `<img src="${nearest.icon}" class="hud-coin-img" alt="${nearest.name}"> ${nearest.name}`;
+                document.getElementById('target-dist').innerText = minDist > 1000 ? `${(minDist / 1000).toFixed(1)} km` : `${minDist} m`;
+            }
+
+            if (activeSpot) renderPikminQuiz();
+            updateProgressUI();
+        }
+
+        function updateProgressUI() {
+            const collectedCount = spots.filter(s => s.collected).length;
+            document.getElementById('progress-fill').style.width = `${(collectedCount / spots.length) * 100}%`;
+            if (collectedCount === spots.length) {
+                document.getElementById('win-modal').style.display = 'flex';
+            }
+        }
+
         function startGeolocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.watchPosition(
                     pos => updatePlayerPosition([pos.coords.latitude, pos.coords.longitude]),
-                    err => console.log('GPS 存取失敗'),
+                    err => console.log('GPS 權限未開啟'),
                     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
             }
         }
 
-        function recenterMap() { if (map && userCoords) map.flyTo(userCoords, 16); }
         function showToast(msg) {
             const toast = document.getElementById('toast');
             toast.innerText = msg; toast.style.display = 'block';
             setTimeout(() => { toast.style.display = 'none'; }, 3500);
         }
+
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function skipLoginForTesting() {
-            document.getElementById('login-overlay').style.display = 'none';
-            document.getElementById('brand-title').innerText = `🌸 測試玩家`;
-            startGeolocation();
-        }
-        function checkUrlParamsAndInit() { document.getElementById('login-overlay').style.display = 'none'; startGeolocation(); }
 
         window.onload = initMap;
     </script>
