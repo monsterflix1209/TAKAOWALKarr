@@ -299,6 +299,7 @@
             z-index: 4000; background: rgba(40, 40, 40, 0.9); color: white;
             padding: 10px 20px; border-radius: 20px; font-size: 0.88rem; display: none;
             backdrop-filter: blur(4px); font-weight: 700; box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            text-align: center; white-space: nowrap;
         }
     </style>
 </head>
@@ -399,6 +400,7 @@
         let isBgmPlaying = true;
         let lastGeocodeCoords = null;
         let activeSpot = null;
+        let offlineChecked = false;
 
         // 🌀 雷達動畫變數
         let radarFrames = [];
@@ -478,16 +480,62 @@
             isBgmPlaying = !isBgmPlaying;
         }
 
-        // ⚡ 依 5, 15, 25...自動減去 15 分鐘並取得過去 2 小時（13張）雷達圖資
+        // ⚡ 儲存離線狀態
+        function saveOfflinePos(coords) {
+            const data = {
+                lat: coords[0],
+                lng: coords[1],
+                time: Date.now()
+            };
+            localStorage.setItem('takaowalk_last_pos', JSON.stringify(data));
+        }
+
+        // ⚡ 離線時間與距離補算邏輯（包含搭車/開車）
+        function checkAndApplyOfflineDistance(newCoords) {
+            if (offlineChecked) return;
+            offlineChecked = true;
+
+            const lastDataRaw = localStorage.getItem('takaowalk_last_pos');
+            if (!lastDataRaw) return;
+
+            try {
+                const lastData = JSON.parse(lastDataRaw);
+                const now = Date.now();
+                const timeDiffSec = (now - lastData.time) / 1000;
+
+                // 條件：離線時間介於 30 秒至 24 小時之間
+                if (timeDiffSec >= 30 && timeDiffSec <= 86400) {
+                    const distMeters = getDistance(lastData.lat, lastData.lng, newCoords[0], newCoords[1]);
+
+                    // 不限制移動速度，只要移動超過 10 公尺皆採計
+                    if (distMeters >= 10) {
+                        totalDistanceMeters += distMeters;
+                        const addedKm = (distMeters / 1000).toFixed(2);
+                        showToast(`🚗 歡迎回來！離線期間為您採計了 ${addedKm} km！`);
+                        saveLocalState();
+                        syncDataToGAS();
+                    }
+                }
+            } catch (e) {
+                console.error('離線距離計算失敗', e);
+            }
+        }
+
+        // 離線狀態監聽：視頁面關閉或背景時主動儲存位置
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden' && userCoords) {
+                saveOfflinePos(userCoords);
+            }
+        });
+
+        // 🌀 雷達圖資計算
         function getPast2HoursRadarFrames() {
             const frames = [];
             const now = new Date();
             
-            // 核心邏輯：自動減去 15 分鐘以匹配氣象署產圖延遲，並向下對齊 10 分鐘單位
             let baseTime = new Date(now.getTime() - 15 * 60 * 1000);
             baseTime.setMinutes(Math.floor(baseTime.getMinutes() / 10) * 10, 0, 0);
 
-            // 計算過去 120 分鐘（由舊到新，共 13 張）
             for (let i = 12; i >= 0; i--) {
                 const t = new Date(baseTime.getTime() - i * 10 * 60 * 1000);
                 const YYYY = t.getFullYear();
@@ -510,7 +558,6 @@
             radarFrames = getPast2HoursRadarFrames();
             radarFrameIndex = 0;
 
-            // 預載圖片避免播放閃爍
             preloadedRadarImages = radarFrames.map(frame => {
                 const img = new Image();
                 img.src = frame.url;
@@ -524,7 +571,6 @@
                 this.onerror = null;
             };
 
-            // 每 100 毫秒（0.1秒）播放一張
             radarAnimationTimer = setInterval(() => {
                 if (radarFrames.length === 0) return;
 
@@ -698,6 +744,7 @@
         function skipLoginForTesting() {
             tryAutoPlayBGM();
             localStorage.removeItem('takaowalk_user');
+            localStorage.removeItem('takaowalk_last_pos');
             
             document.getElementById('login-overlay').style.display = 'none';
             currentLineId = 'test_guest';
@@ -784,6 +831,13 @@
 
         function updatePlayerPosition(coords) {
             userCoords = coords;
+
+            // 首次定位觸發離線距離補算
+            checkAndApplyOfflineDistance(coords);
+
+            // 當前持續記錄最新座標與時間標記
+            saveOfflinePos(coords);
+
             if (previousPosition) {
                 const moved = getDistance(previousPosition[0], previousPosition[1], coords[0], coords[1]);
                 if (moved >= 3) {
@@ -840,7 +894,7 @@
         function showToast(msg) {
             const toast = document.getElementById('toast');
             toast.innerText = msg; toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+            setTimeout(() => { toast.style.display = 'none'; }, 3500);
         }
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
