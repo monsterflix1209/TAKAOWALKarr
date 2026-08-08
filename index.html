@@ -350,8 +350,8 @@
         <div class="radar-card" onclick="event.stopPropagation()">
             <div class="radar-header">
                 <div>
-                    <div class="radar-title">🌀 白海豚颱風 - 雷達迴波</div>
-                    <div class="radar-time" id="radar-time-tag">更新時間計算中...</div>
+                    <div class="radar-title">🌀 白海豚颱風 - 2小時迴波動畫 (0.1s/幀)</div>
+                    <div class="radar-time" id="radar-time-tag">播放載入中...</div>
                 </div>
                 <button class="pikmin-close-btn" style="position:static;" onclick="closeRadarModal()">✕</button>
             </div>
@@ -399,6 +399,12 @@
         let isBgmPlaying = true;
         let lastGeocodeCoords = null;
         let activeSpot = null;
+
+        // 🌀 雷達動畫變數
+        let radarFrames = [];
+        let radarFrameIndex = 0;
+        let radarAnimationTimer = null;
+        let preloadedRadarImages = [];
 
         const spots = [
             { 
@@ -472,44 +478,79 @@
             isBgmPlaying = !isBgmPlaying;
         }
 
-        function getCwaRadarUrl() {
+        // ⚡ 依 5, 15, 25...自動減去 15 分鐘並取得過去 2 小時（13張）雷達圖資
+        function getPast2HoursRadarFrames() {
+            const frames = [];
             const now = new Date();
-            const minutes10 = Math.floor(now.getMinutes() / 10) * 10;
-            now.setMinutes(minutes10 - 20);
+            
+            // 核心邏輯：自動減去 15 分鐘以匹配氣象署產圖延遲，並向下對齊 10 分鐘單位
+            let baseTime = new Date(now.getTime() - 15 * 60 * 1000);
+            baseTime.setMinutes(Math.floor(baseTime.getMinutes() / 10) * 10, 0, 0);
 
-            const YYYY = now.getFullYear();
-            const MM = String(now.getMonth() + 1).padStart(2, '0');
-            const DD = String(now.getDate()).padStart(2, '0');
-            const HH = String(now.getHours()).padStart(2, '0');
-            const mm = String(now.getMinutes()).padStart(2, '0');
+            // 計算過去 120 分鐘（由舊到新，共 13 張）
+            for (let i = 12; i >= 0; i--) {
+                const t = new Date(baseTime.getTime() - i * 10 * 60 * 1000);
+                const YYYY = t.getFullYear();
+                const MM = String(t.getMonth() + 1).padStart(2, '0');
+                const DD = String(t.getDate()).padStart(2, '0');
+                const HH = String(t.getHours()).padStart(2, '0');
+                const mm = String(t.getMinutes()).padStart(2, '0');
 
-            const timeString = `${YYYY}-${MM}-${DD} ${HH}:${mm}`;
-            const imgUrl = `https://www.cwa.gov.tw/Data/radar/CV1_3600_${YYYY}${MM}${DD}${HH}${mm}.png`;
+                const timeString = `${YYYY}-${MM}-${DD} ${HH}:${mm}`;
+                const imgUrl = `https://www.cwa.gov.tw/Data/radar/CV1_3600_${YYYY}${MM}${DD}${HH}${mm}.png`;
 
-            return { url: imgUrl, timeStr: timeString };
+                frames.push({ url: imgUrl, timeStr: timeString });
+            }
+            return frames;
         }
 
-        // 自動刷新氣象圖（阻斷死鎖迴圈）
-        function refreshRadarImage() {
-            const radarData = getCwaRadarUrl();
-            const img = document.getElementById('radar-img');
+        function startRadarAnimation() {
+            stopRadarAnimation();
 
-            img.onerror = function() {
+            radarFrames = getPast2HoursRadarFrames();
+            radarFrameIndex = 0;
+
+            // 預載圖片避免播放閃爍
+            preloadedRadarImages = radarFrames.map(frame => {
+                const img = new Image();
+                img.src = frame.url;
+                return img;
+            });
+
+            const radarImg = document.getElementById('radar-img');
+            const timeTag = document.getElementById('radar-time-tag');
+
+            radarImg.onerror = function() {
                 this.onerror = null;
-                showToast('⚠️ 氣象署圖像生成中，請稍後重試');
             };
 
-            img.src = radarData.url + '?t=' + new Date().getTime();
-            document.getElementById('radar-time-tag').innerText = `觀測時間：${radarData.timeStr}`;
+            // 每 100 毫秒（0.1秒）播放一張
+            radarAnimationTimer = setInterval(() => {
+                if (radarFrames.length === 0) return;
+
+                const currentFrame = radarFrames[radarFrameIndex];
+                radarImg.src = currentFrame.url;
+                timeTag.innerText = `▶ 觀測時間：${currentFrame.timeStr} (0.1s/幀)`;
+
+                radarFrameIndex = (radarFrameIndex + 1) % radarFrames.length;
+            }, 100);
+        }
+
+        function stopRadarAnimation() {
+            if (radarAnimationTimer) {
+                clearInterval(radarAnimationTimer);
+                radarAnimationTimer = null;
+            }
         }
 
         function openRadarModal() {
-            refreshRadarImage();
+            startRadarAnimation();
             document.getElementById('radar-modal').style.display = 'flex';
         }
 
         function closeRadarModal(e) {
             if (e && e.target !== e.currentTarget && !e.target.classList.contains('pikmin-close-btn')) return;
+            stopRadarAnimation();
             document.getElementById('radar-modal').style.display = 'none';
         }
 
@@ -562,9 +603,6 @@
             });
 
             checkUrlParamsAndInit();
-
-            // 定時每 10 分鐘自動重整圖層
-            setInterval(refreshRadarImage, 10 * 60 * 1000);
         }
 
         function recenterMap() {
@@ -659,16 +697,18 @@
 
         function skipLoginForTesting() {
             tryAutoPlayBGM();
+            localStorage.removeItem('takaowalk_user');
+            
             document.getElementById('login-overlay').style.display = 'none';
             currentLineId = 'test_guest';
             currentName = '測試玩家';
             document.getElementById('brand-title').innerText = `🌸 ${currentName}`;
             totalDistanceMeters = 0;
             document.getElementById('total-walked').innerText = `🚶 0.00 km`;
-            saveLocalState();
+            
             updateProgressUI();
             startGeolocation();
-            showToast('⚡ 已進入測試模式');
+            showToast('⚡ 已進入測試模式（重新整理即可回到登入頁）');
         }
 
         function checkUrlParamsAndInit() {
@@ -691,20 +731,23 @@
                 const cachedUser = localStorage.getItem('takaowalk_user');
                 if (cachedUser) {
                     const userData = JSON.parse(cachedUser);
-                    currentLineId = userData.lineId;
-                    currentName = userData.name;
-                    totalDistanceMeters = userData.distMeters || 0;
-                    if (userData.collectedSpots) {
-                        spots.forEach(s => { if (userData.collectedSpots.includes(s.id)) s.collected = true; });
+                    if (userData.lineId && userData.lineId !== 'test_guest') {
+                        currentLineId = userData.lineId;
+                        currentName = userData.name;
+                        totalDistanceMeters = userData.distMeters || 0;
+                        if (userData.collectedSpots) {
+                            spots.forEach(s => { if (userData.collectedSpots.includes(s.id)) s.collected = true; });
+                        }
+                        enterGameUI();
+                        return;
                     }
-                    enterGameUI();
-                } else {
-                    document.getElementById('login-overlay').style.display = 'flex';
                 }
+                document.getElementById('login-overlay').style.display = 'flex';
             }
         }
 
         function saveLocalState() {
+            if (!currentLineId || currentLineId === 'test_guest') return;
             const collectedIds = spots.filter(s => s.collected).map(s => s.id);
             const userCache = {
                 lineId: currentLineId,
