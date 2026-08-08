@@ -71,22 +71,21 @@
 
         .brand-container { display: flex; flex-direction: column; align-items: flex-start; }
         .brand-title { font-weight: 800; font-size: 0.9rem; color: #ff758c; }
-        .road-name { font-size: 0.68rem; color: #e63946; font-weight: 700; margin-top: 1px; max-width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .road-name { font-size: 0.68rem; color: #e63946; font-weight: 700; margin-top: 1px; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .action-tools { display: flex; gap: 4px; align-items: center; flex-wrap: nowrap; }
+        .action-tools { display: flex; gap: 6px; align-items: center; flex-wrap: nowrap; }
 
         .icon-btn {
             background: #ffffff; border: 1.5px solid #ffccd5; border-radius: 12px;
-            padding: 5px 7px; display: flex; align-items: center; justify-content: center;
-            font-size: 0.75rem; font-weight: 800; color: #5c544d; cursor: pointer;
+            padding: 6px 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; cursor: pointer;
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06); transition: transform 0.1s; white-space: nowrap;
         }
         .icon-btn:active { transform: scale(0.92); }
-        .icon-btn.rocket-btn { background: #ffe5ec; border-color: #ff4d6d; color: #ff4d6d; }
-        .icon-btn.feed-btn { background: #e8f5e9; border-color: #81c784; color: #2e7d32; }
+        .icon-btn.rocket-btn { background: #ffe5ec; border-color: #ff4d6d; }
 
         .dist-tracker {
-            font-size: 0.75rem; background: #fff0f3; padding: 4px 6px; border-radius: 10px;
+            font-size: 0.75rem; background: #fff0f3; padding: 6px 8px; border-radius: 10px;
             color: #ff4d6d; font-weight: 800; border: 1px solid #ffccd5; white-space: nowrap;
         }
 
@@ -114,10 +113,6 @@
         .food-badge:active { transform: scale(0.8); }
         .food-icon-img { width: 28px; height: 28px; object-fit: contain; }
 
-        .coin-icon-wrapper { display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        .coin-icon-img { width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); transition: transform 0.2s; }
-        .hud-coin-img { width: 22px; height: 22px; object-fit: contain; }
-
         .player-avatar {
             width: 24px; height: 24px; background-color: #3a86ff; border: 3px solid #ffffff;
             border-radius: 50%; box-shadow: 0 0 12px rgba(58, 134, 255, 0.6); animation: pulse 1.8s infinite;
@@ -128,26 +123,28 @@
             100% { box-shadow: 0 0 0 0 rgba(58, 134, 255, 0); }
         }
 
-        .explore-modal {
+        .explore-modal, .radar-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh;
             z-index: 2900; background: rgba(20, 20, 25, 0.65); backdrop-filter: blur(6px);
             justify-content: center; align-items: flex-end;
         }
 
-        .explore-card {
+        .explore-card, .radar-card {
             width: 100%; max-width: 480px; max-height: 85vh; max-height: 85dvh; background: #ffffff;
             border-radius: 28px 28px 0 0; display: flex; flex-direction: column; padding: 20px;
             box-shadow: 0 -10px 40px rgba(0,0,0,0.3); overflow-y: auto;
         }
 
-        .explore-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .explore-header, .radar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .explore-title { font-size: 1.2rem; font-weight: 800; color: #ff4d6d; }
+        .radar-title { font-weight: 800; color: #023e8a; font-size: 1.05rem; }
+        .radar-time { font-size: 0.75rem; color: #6c757d; margin-top: 2px; }
 
-        .explore-sub-bar {
-            display: flex; justify-content: space-between; align-items: center; background: #fdf2f4;
-            padding: 10px 14px; border-radius: 14px; margin-bottom: 14px; border: 1px solid #ffe3e8;
+        .radar-img-box {
+            width: 100%; height: 280px; background: #000; border-radius: 16px;
+            overflow: hidden; display: flex; justify-content: center; align-items: center;
         }
-        .explore-sub-text { font-size: 0.82rem; font-weight: 700; color: #7209b7; }
+        .radar-img-box img { width: 100%; height: 100%; object-fit: contain; }
 
         .rocket-list { display: flex; flex-direction: column; gap: 12px; }
         .rocket-item {
@@ -178,6 +175,12 @@
 
         @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-3px); } }
 
+        .close-circle-btn {
+            width: 32px; height: 32px; background: #f0f0f0; border: none;
+            border-radius: 50%; font-weight: bold; font-size: 1rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; color: #555;
+        }
+
         .video-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh;
             z-index: 5000; background: #000000; justify-content: center; align-items: center;
@@ -189,7 +192,6 @@
             border-radius: 24px; font-weight: 800; font-size: 1.05rem; cursor: pointer; margin-top: 14px;
             box-shadow: 0 6px 18px rgba(6, 199, 85, 0.35); transition: transform 0.15s ease;
         }
-        .line-reward-btn:active { transform: scale(0.96); }
 
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -199,10 +201,6 @@
         .modal-content {
             background: #ffffff; padding: 24px; border-radius: 28px; width: 85%; max-width: 360px;
             text-align: center; box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-        }
-        .modal-btn {
-            margin-top: 16px; padding: 10px 24px; background: var(--pastel-pink); color: white;
-            border: none; border-radius: 20px; font-weight: 700; font-size: 0.95rem; cursor: pointer;
         }
 
         .toast {
@@ -237,9 +235,9 @@
             <div class="road-name" id="road-name">📍 定位中...</div>
         </div>
         <div class="action-tools">
-            <button class="icon-btn feed-btn" onclick="scanNearbyRealPlaces()">📡 掃描實體地標</button>
-            <button class="icon-btn rocket-btn" onclick="openExploreModal()">🚀 探險</button>
-            <button class="icon-btn" id="recenter-btn" onclick="recenterMap()">🎯 定位</button>
+            <button class="icon-btn rocket-btn" onclick="openExploreModal()" title="探險">🚀</button>
+            <button class="icon-btn" id="radar-btn" onclick="openRadarModal()" title="雷達迴波">🌀</button>
+            <button class="icon-btn" id="recenter-btn" onclick="recenterMap()" title="定位">🎯</button>
             <button class="icon-btn" id="bgm-btn" onclick="toggleBGM()">🎵</button>
             <div class="dist-tracker" id="total-walked">🚶 0.00 km</div>
         </div>
@@ -258,15 +256,24 @@
         <div class="explore-card" onclick="event.stopPropagation()">
             <div class="explore-header">
                 <div class="explore-title">🚀 火箭探險進度</div>
-                <button class="icon-btn" style="position:static;" onclick="closeExploreModal()">✕</button>
+                <button class="close-circle-btn" onclick="closeExploreModal()">✕</button>
             </div>
-            
-            <div class="explore-sub-bar">
-                <div class="explore-sub-text">💡 造訪真實地標收集 12 個能量球充能！</div>
-                <button class="icon-btn feed-btn" onclick="scanNearbyRealPlaces()">📡 重新掃描地標</button>
-            </div>
-
             <div class="rocket-list" id="rocket-list"></div>
+        </div>
+    </div>
+
+    <div class="radar-modal" id="radar-modal" onclick="closeRadarModal(event)">
+        <div class="radar-card" onclick="event.stopPropagation()">
+            <div class="radar-header">
+                <div>
+                    <div class="radar-title">🌀 2小時雷達迴波動畫</div>
+                    <div class="radar-time" id="radar-time-tag">載入中...</div>
+                </div>
+                <button class="close-circle-btn" onclick="closeRadarModal()">✕</button>
+            </div>
+            <div class="radar-img-box">
+                <img id="radar-img" alt="雷達迴波圖">
+            </div>
         </div>
     </div>
 
@@ -287,16 +294,8 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbx-ZuM0QX6rncNxsUcBct7CIcK89UVhgn3KOsJiPRug4NIFzTzX3LdtCUgd-546oRSJSQ/exec';
-        const LINE_CHANNEL_ID = '2011007742';
+        const LINE_STAMP_URLS = { 1: 'https://u.lin.ee/XAVBp5D', 2: 'https://u.lin.ee/zdsJMfi', 3: 'https://u.lin.ee/z60aQv3' };
 
-        const LINE_STAMP_URLS = {
-            1: 'https://u.lin.ee/XAVBp5D',
-            2: 'https://u.lin.ee/zdsJMfi',
-            3: 'https://u.lin.ee/z60aQv3'
-        };
-
-        // 🍡 更新後的 5 款美食能量球與動態檔名設定
         const foodTypes = [
             { key: 'rice', name: '咕嚕飯', rocketName: '咕嚕飯一號', planetName: '咕嚕飯星球', img: 'rice.svg', video: 'rice_planet.mp4' },
             { key: 'noodle', name: '咕唧麵', rocketName: '咕唧麵一號', planetName: '咕唧麵星球', img: 'noodle.svg', video: 'noodle_planet.mp4' },
@@ -308,16 +307,21 @@
         let foodCounts = { rice: 0, noodle: 0, latte: 0, boba: 0, marshmallow: 0 };
         let launchedRockets = { rice: false, noodle: false, latte: false, boba: false, marshmallow: false };
         let activeFoodMarkers = [];
-        let loadedPlaceIds = new Set(); // 避免重複載入地標
+        let loadedPlaceIds = new Set();
 
-        let currentLineId = null;
-        let currentName = null;
-        let isBgmPlaying = true;
         let userCoords = [22.6250, 120.3000];
         let map, playerMarker;
         let totalDistanceMeters = 0;
         let previousPosition = null;
         let lastScanPosition = null;
+
+        // 地名防抖變數
+        let lastGeocodeTime = 0;
+        let lastGeocodeCoords = null;
+
+        // 雷達變數
+        let radarFrames = [], radarFrameIndex = 0, radarAnimationTimer = null;
+        let isBgmPlaying = true;
 
         function initMap() {
             map = L.map('map', { zoomControl: false, attributionControl: false, minZoom: 7, maxZoom: 18 }).setView(userCoords, 16);
@@ -333,13 +337,72 @@
             checkUrlParamsAndInit();
         }
 
-        // 🌐 串接 Overpass API 抓取真實地標並生成能量球
-        async function scanNearbyRealPlaces() {
-            if (!userCoords) return;
-            showToast('📡 掃描周邊真實店家與超商中...');
+        // 📍 防抖順暢即時地名抓取
+        async function fetchRoadName(lat, lng) {
+            const now = Date.now();
+            
+            // 節流保護：10秒內不重複請求
+            if (now - lastGeocodeTime < 10000) return;
+            
+            // 距離保護：移動未滿 25 公尺不重複發請求
+            if (lastGeocodeCoords) {
+                const dist = getDistance(lastGeocodeCoords[0], lastGeocodeCoords[1], lat, lng);
+                if (dist < 25) return;
+            }
 
+            lastGeocodeTime = now;
+            lastGeocodeCoords = [lat, lng];
+
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=zh-TW`);
+                const data = await res.json();
+                
+                if (data && data.address) {
+                    const addr = data.address;
+                    const road = addr.road || addr.pedestrian || addr.suburb || addr.neighbourhood || addr.city || '探索區域';
+                    document.getElementById('road-name').innerText = `📍 ${road}`;
+                }
+            } catch (err) {
+                console.error('地名取得失敗', err);
+            }
+        }
+
+        function updatePlayerPosition(coords) {
+            userCoords = coords;
+
+            // 觸發地名更新
+            fetchRoadName(coords[0], coords[1]);
+
+            if (!lastScanPosition) {
+                lastScanPosition = coords;
+                autoScanNearbyRealPlaces();
+            } else {
+                const walkedDist = getDistance(lastScanPosition[0], lastScanPosition[1], coords[0], coords[1]);
+                if (walkedDist >= 50) {
+                    lastScanPosition = coords;
+                    autoScanNearbyRealPlaces();
+                }
+            }
+
+            if (previousPosition) {
+                const moved = getDistance(previousPosition[0], previousPosition[1], coords[0], coords[1]);
+                if (moved >= 3) {
+                    totalDistanceMeters += moved;
+                    previousPosition = coords;
+                }
+            } else {
+                previousPosition = coords;
+                map.panTo(coords);
+            }
+
+            playerMarker.setLatLng(coords);
+            document.getElementById('total-walked').innerText = `🚶 ${(totalDistanceMeters / 1000).toFixed(2)} km`;
+        }
+
+        async function autoScanNearbyRealPlaces() {
+            if (!userCoords) return;
             const [lat, lng] = userCoords;
-            const radius = 300; // 掃描周圍 300 公尺
+            const radius = 300;
 
             const query = `
                 [out:json][timeout:10];
@@ -360,7 +423,6 @@
                 const data = await res.json();
                 
                 if (data && data.elements) {
-                    let newSpawnCount = 0;
                     data.elements.forEach(place => {
                         if (loadedPlaceIds.has(place.id)) return;
                         
@@ -368,54 +430,40 @@
                         if (foodKey) {
                             loadedPlaceIds.add(place.id);
                             spawnFoodAtRealLocation(place.lat, place.lon, place.tags?.name || '在地名店', foodKey);
-                            newSpawnCount++;
                         }
                     });
-
-                    if (newSpawnCount > 0) {
-                        showToast(`✨ 精準匯入！發現 ${newSpawnCount} 家真實地標並生成能量球！`);
-                    } else {
-                        showToast('📍 周邊地標已載入完成');
-                    }
                 }
             } catch (err) {
-                console.error('Overpass API 讀取失敗', err);
-                showToast('📡 網路微弱，改為輔助生成');
+                console.error('API 讀取失敗', err);
             }
         }
 
-        // 🏷️ 店家類別分類判斷
         function classifyPlaceToFoodKey(place) {
             const tags = place.tags || {};
             const shop = tags.shop || '';
             const amenity = tags.amenity || '';
             const name = tags.name || '';
 
-            if (shop === 'convenience') return 'latte'; // 超商 -> 冰拿鐵
-            if (shop === 'beverage' || amenity === 'cafe') return 'boba'; // 飲料店/咖啡 -> 啵啵奶
-            if (shop === 'bakery' || shop === 'pastry') return 'marshmallow'; // 麵包甜點 -> 棉花糖
+            if (shop === 'convenience') return 'latte';
+            if (shop === 'beverage' || amenity === 'cafe') return 'boba';
+            if (shop === 'bakery' || shop === 'pastry') return 'marshmallow';
 
             if (amenity === 'restaurant' || amenity === 'fast_food') {
                 if (name.includes('麵') || name.includes('拉麵') || name.includes('義式') || name.toLowerCase().includes('noodle')) {
-                    return 'noodle'; // 麵食 -> 咕唧麵
+                    return 'noodle';
                 }
-                return 'rice'; // 預設飯類 -> 咕嚕飯
+                return 'rice';
             }
             return null;
         }
 
-        // 📍 建立真實店家能量球 Marker
         function spawnFoodAtRealLocation(lat, lng, shopName, foodKey) {
             const food = foodTypes.find(f => f.key === foodKey);
             if (!food) return;
 
             const foodIcon = L.divIcon({
                 className: 'food-icon-wrapper',
-                html: `
-                    <div class="food-badge" title="${shopName}">
-                        <img src="${food.img}" class="food-icon-img" alt="${food.name}">
-                    </div>
-                `,
+                html: `<div class="food-badge" title="${shopName}"><img src="${food.img}" class="food-icon-img" alt="${food.name}"></div>`,
                 iconSize: [42, 42], iconAnchor: [21, 21]
             });
 
@@ -425,60 +473,63 @@
                 map.removeLayer(marker);
                 activeFoodMarkers = activeFoodMarkers.filter(m => m !== marker);
                 foodCounts[foodKey] = (foodCounts[foodKey] || 0) + 1;
-                
                 showToast(`🎉 於【${shopName}】採集 1 個【${food.name}能量球】！`);
-                saveLocalState();
-                syncDataToGAS();
 
-                if (document.getElementById('explore-modal').style.display === 'flex') {
-                    renderExploreRockets();
-                }
+                if (document.getElementById('explore-modal').style.display === 'flex') renderExploreRockets();
             });
 
             activeFoodMarkers.push(marker);
         }
 
-        function updatePlayerPosition(coords) {
-            userCoords = coords;
+        /* 🌀 雷達迴波 */
+        function getPast2HoursRadarFrames() {
+            const frames = [];
+            const now = new Date();
+            let baseTime = new Date(now.getTime() - 15 * 60 * 1000);
+            baseTime.setMinutes(Math.floor(baseTime.getMinutes() / 10) * 10, 0, 0);
 
-            if (!lastScanPosition) {
-                lastScanPosition = coords;
-                scanNearbyRealPlaces();
-            } else {
-                // 🚶 移動超過 50 公尺自動重新動態生成新能量球
-                const walkedDist = getDistance(lastScanPosition[0], lastScanPosition[1], coords[0], coords[1]);
-                if (walkedDist >= 50) {
-                    lastScanPosition = coords;
-                    scanNearbyRealPlaces();
-                }
+            for (let i = 12; i >= 0; i--) {
+                const t = new Date(baseTime.getTime() - i * 10 * 60 * 1000);
+                const YYYY = t.getFullYear();
+                const MM = String(t.getMonth() + 1).padStart(2, '0');
+                const DD = String(t.getDate()).padStart(2, '0');
+                const HH = String(t.getHours()).padStart(2, '0');
+                const mm = String(t.getMinutes()).padStart(2, '0');
+
+                frames.push({
+                    url: `https://www.cwa.gov.tw/Data/radar/CV1_3600_${YYYY}${MM}${DD}${HH}${mm}.png`,
+                    timeStr: `${YYYY}-${MM}-${DD} ${HH}:${mm}`
+                });
             }
-
-            if (previousPosition) {
-                const moved = getDistance(previousPosition[0], previousPosition[1], coords[0], coords[1]);
-                if (moved >= 3) {
-                    totalDistanceMeters += moved;
-                    previousPosition = coords;
-                    saveLocalState();
-                    syncDataToGAS();
-                }
-            } else {
-                previousPosition = coords;
-                map.panTo(coords);
-            }
-
-            playerMarker.setLatLng(coords);
-            document.getElementById('total-walked').innerText = `🚶 ${(totalDistanceMeters / 1000).toFixed(2)} km`;
+            return frames;
         }
 
-        function openExploreModal() {
-            renderExploreRockets();
-            document.getElementById('explore-modal').style.display = 'flex';
+        function startRadarAnimation() {
+            stopRadarAnimation();
+            radarFrames = getPast2HoursRadarFrames();
+            radarFrameIndex = 0;
+
+            const radarImg = document.getElementById('radar-img');
+            const timeTag = document.getElementById('radar-time-tag');
+
+            radarAnimationTimer = setInterval(() => {
+                if (radarFrames.length === 0) return;
+                const currentFrame = radarFrames[radarFrameIndex];
+                radarImg.src = currentFrame.url;
+                timeTag.innerText = `▶ 時間：${currentFrame.timeStr}`;
+                radarFrameIndex = (radarFrameIndex + 1) % radarFrames.length;
+            }, 120);
         }
 
-        function closeExploreModal(e) {
-            if (e && e.target !== e.currentTarget) return;
-            document.getElementById('explore-modal').style.display = 'none';
+        function stopRadarAnimation() {
+            if (radarAnimationTimer) { clearInterval(radarAnimationTimer); radarAnimationTimer = null; }
         }
+
+        function openRadarModal() { startRadarAnimation(); document.getElementById('radar-modal').style.display = 'flex'; }
+        function closeRadarModal(e) { if (e && e.target !== e.currentTarget && !e.target.classList.contains('close-circle-btn')) return; stopRadarAnimation(); document.getElementById('radar-modal').style.display = 'none'; }
+
+        function openExploreModal() { renderExploreRockets(); document.getElementById('explore-modal').style.display = 'flex'; }
+        function closeExploreModal(e) { if (e && e.target !== e.currentTarget) return; document.getElementById('explore-modal').style.display = 'none'; }
 
         function renderExploreRockets() {
             const listEl = document.getElementById('rocket-list');
@@ -488,18 +539,10 @@
                 const isReady = !isLaunched && count >= 12;
 
                 let statusText = `⚡ 能量：${count} / 12`;
-                let btnText = '充能中';
-                let btnClass = 'launch-btn';
+                let btnText = '充能中', btnClass = 'launch-btn';
 
-                if (isLaunched) {
-                    statusText = `🚀 已完成太空探險`;
-                    btnText = '已發射';
-                    btnClass = 'launch-btn launched';
-                } else if (isReady) {
-                    statusText = `⚡ 能量已滿（12/12）`;
-                    btnText = '🚀 發射';
-                    btnClass = 'launch-btn ready';
-                }
+                if (isLaunched) { statusText = `🚀 已完成太空探險`; btnText = '已發射'; btnClass = 'launch-btn launched'; }
+                else if (isReady) { statusText = `⚡ 能量已滿（12/12）`; btnText = '🚀 發射'; btnClass = 'launch-btn ready'; }
 
                 return `
                     <div class="rocket-item ${isLaunched ? 'launched-item' : ''}">
@@ -510,11 +553,7 @@
                                 <div class="rocket-progress-text">${statusText}</div>
                             </div>
                         </div>
-                        <button class="${btnClass}" 
-                                onclick="${isReady ? `launchRocket('${food.key}')` : ''}" 
-                                ${!isReady ? 'disabled' : ''}>
-                            ${btnText}
-                        </button>
+                        <button class="${btnClass}" onclick="${isReady ? `launchRocket('${food.key}')` : ''}" ${!isReady ? 'disabled' : ''}>${btnText}</button>
                     </div>
                 `;
             }).join('');
@@ -525,47 +564,39 @@
             if (!food || launchedRockets[foodKey] || (foodCounts[foodKey] || 0) < 12) return;
 
             closeExploreModal();
-
             const videoOverlay = document.getElementById('video-overlay');
             const video = document.getElementById('rocket-video');
 
             video.src = food.video;
             videoOverlay.style.display = 'flex';
-
-            video.play().catch(e => console.log("影片自動播放被阻止", e));
+            video.play().catch(e => console.log("影片播放限制", e));
 
             video.onended = () => {
                 videoOverlay.style.display = 'none';
                 video.src = '';
-
                 foodCounts[foodKey] -= 12;
                 launchedRockets[foodKey] = true;
 
                 const rand = Math.random();
-                let coins = 1;
-                if (rand > 0.85) coins = 3;
-                else if (rand > 0.50) coins = 2;
-
-                saveLocalState();
-                syncDataToGAS();
-
+                let coins = rand > 0.85 ? 3 : (rand > 0.50 ? 2 : 1);
                 showCoinRewardModal(coins, `🪐 發射【${food.rocketName}】抵達【${food.planetName}】！`);
             };
         }
 
         function showCoinRewardModal(coins, titleMsg) {
             const modal = document.getElementById('coin-reward-modal');
-            const titleEl = document.getElementById('coin-modal-title');
-            const descEl = document.getElementById('coin-modal-desc');
-            const btnEl = document.getElementById('coin-modal-link-btn');
-
-            const link = LINE_STAMP_URLS[coins] || LINE_STAMP_URLS[1];
-
-            titleEl.innerText = titleMsg || `🎉 獲得 ${coins} 枚金幣！`;
-            descEl.innerHTML = `恭喜您獲得 <b>${coins} 枚金幣獎勵</b>！<br>請點擊下方按鈕直接連線至 LINE 領取集點！`;
-            btnEl.onclick = () => { window.location.href = link; };
-
+            document.getElementById('coin-modal-title').innerText = titleMsg || `🎉 獲得 ${coins} 枚金幣！`;
+            document.getElementById('coin-modal-desc').innerHTML = `恭喜您獲得 <b>${coins} 枚金幣獎勵</b>！<br>請點擊下方按鈕直接連線至 LINE 領取集點！`;
+            document.getElementById('coin-modal-link-btn').onclick = () => { window.location.href = LINE_STAMP_URLS[coins] || LINE_STAMP_URLS[1]; };
             modal.style.display = 'flex';
+        }
+
+        function toggleBGM() {
+            const bgm = document.getElementById('bgm');
+            const btn = document.getElementById('bgm-btn');
+            if (isBgmPlaying) { bgm.pause(); btn.innerText = '🔇'; }
+            else { bgm.volume = 0.08; bgm.play(); btn.innerText = '🎵'; }
+            isBgmPlaying = !isBgmPlaying;
         }
 
         function getDistance(lat1, lon1, lat2, lon2) {
@@ -595,13 +626,10 @@
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         function skipLoginForTesting() {
             document.getElementById('login-overlay').style.display = 'none';
-            currentLineId = 'test_guest'; currentName = '測試玩家';
-            document.getElementById('brand-title').innerText = `🌸 ${currentName}`;
+            document.getElementById('brand-title').innerText = `🌸 測試玩家`;
             startGeolocation();
         }
         function checkUrlParamsAndInit() { document.getElementById('login-overlay').style.display = 'none'; startGeolocation(); }
-        function saveLocalState() {}
-        function syncDataToGAS() {}
 
         window.onload = initMap;
     </script>
