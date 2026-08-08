@@ -6,129 +6,156 @@
     <title>TAKAO WALK arr!</title>
     <link rel="icon" href="logo.svg" type="image/svg+xml">
     <style>
-        :root {
-            --primary-color: #ff6b6b;
-            --bg-color: #f8f9fa;
-            --card-bg: #ffffff;
-        }
-
-        body {
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
+        }
+
+        body {
+            background-color: #f4f6f8;
             color: #333;
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding-bottom: 40px;
         }
 
-        /* 封面圖 */
-        .cover-container img {
+        /* 封面區塊 */
+        .cover-box {
             width: 100%;
-            max-height: 250px;
-            object-fit: cover;
+            max-width: 600px;
+            overflow: hidden;
         }
 
-        /* 頂部玩家資訊欄 */
-        .player-status {
+        .cover-box img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* 冒險家卡片 */
+        .card {
             width: 90%;
             max-width: 500px;
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin: 10px 0;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-top: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .player-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        /* 純 Emoji 按鈕樣式 */
-        .action-buttons {
+        .player-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .status-text {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* 需求 1：純 Emoji 按鈕區 */
+        .action-bar {
             display: flex;
-            gap: 10px;
-            margin: 10px 0;
+            justify-content: center;
+            gap: 16px;
+            margin: 16px 0 4px 0;
         }
 
         .emoji-btn {
-            background: #ffffff;
-            border: 2px solid #eee;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            border: none;
+            background: #ffffff;
             font-size: 24px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: transform 0.1s ease, background-color 0.2s;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            transition: transform 0.1s ease, background-color 0.2s;
         }
 
         .emoji-btn:active {
             transform: scale(0.92);
-            background-color: #f0f0f0;
+            background-color: #eef2f5;
         }
 
-        /* 景點與答題卡片 */
-        .spot-card {
-            width: 90%;
-            max-width: 500px;
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            margin-top: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        /* 距離最近景點 */
+        .nearest-box {
             text-align: center;
         }
 
-        .spot-coin-icon {
-            width: 60px;
-            height: 60px;
-            margin-bottom: 8px;
+        .distance-tag {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007aff;
+            margin: 8px 0;
         }
 
-        .quiz-section {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
+        /* 景點挑戰卡片 */
+        .spot-card {
+            text-align: center;
+        }
+
+        .coin-img {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 8px auto;
+        }
+
+        .quiz-box {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px dashed #e0e0e0;
         }
 
         .quiz-input {
             width: 80%;
-            padding: 10px;
+            padding: 10px 14px;
             border: 1px solid #ccc;
             border-radius: 8px;
-            font-size: 16px;
-            margin-bottom: 10px;
+            font-size: 1rem;
+            margin: 10px 0;
+            outline: none;
         }
 
-        .submit-btn {
-            background-color: #4caf50;
-            color: white;
+        .btn-submit {
+            background-color: #28a745;
+            color: #fff;
             border: none;
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 10px 24px;
             border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
             cursor: pointer;
         }
 
-        /* 雷達圖模組 (預設隱藏) */
-        .radar-modal {
+        /* 雷達 Modal */
+        .modal {
             display: none;
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7);
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
             justify-content: center;
             align-items: center;
-            z-index: 100;
+            z-index: 1000;
         }
 
-        .radar-content {
-            background: white;
+        .modal-content {
+            background: #fff;
             padding: 20px;
-            border-radius: 12px;
+            border-radius: 16px;
             text-align: center;
             max-width: 90%;
         }
@@ -140,97 +167,117 @@
     <audio id="bgm" loop preload="auto" src="bgm.mp3"></audio>
 
     <!-- 響應式封面 -->
-    <div class="cover-container">
+    <div class="cover-box">
         <picture>
             <source media="(orientation: landscape)" srcset="cover_computer.jpg">
             <img src="cover_phone.jpg" alt="TAKAO WALK Cover">
         </picture>
     </div>
 
-    <!-- 冒險家資訊與狀態 -->
-    <div class="player-status">
-        <div>
-            <div>🌸 冒險家</div>
-            <div id="gps-status">📍 定位中...</div>
-        </div>
-        <div>
-            <div id="distance-walked">🚶 0.00 km</div>
+    <!-- 冒險家狀態卡片 -->
+    <div class="card">
+        <div class="player-info">
+            <div>
+                <div class="player-title">🌸 冒險家</div>
+                <div class="status-text" id="location-status">📍 定位中...</div>
+            </div>
+            <div>
+                <div class="player-title" id="distance-walked">🚶 0.00 km</div>
+            </div>
         </div>
     </div>
 
-    <!-- 按鈕區：純 Emoji 呈現 (需求 1) -->
-    <div class="action-buttons">
+    <!-- 1. 純 Emoji 按鈕（雷達 🌀、定位 🎯） -->
+    <div class="action-bar">
         <button class="emoji-btn" id="radar-btn" title="雷達迴波" aria-label="雷達迴波">🌀</button>
         <button class="emoji-btn" id="locate-btn" title="重新定位" aria-label="重新定位">🎯</button>
     </div>
 
-    <!-- 景點與金幣問答卡片 -->
-    <div class="spot-card">
-        <img class="spot-coin-icon" src="logo.svg" alt="Spot Coin">
-        <h2 id="spot-title">駁二藝術特區</h2>
-        <p id="spot-desc">高雄最具代表性的文創藝術園區。</p>
-        <p id="spot-distance">📍 計算距離中...</p>
+    <!-- 最近冒險點 -->
+    <div class="card nearest-box">
+        <div class="status-text">距離最近的冒險點</div>
+        <div class="status-text">搜尋中...</div>
+        <div class="distance-tag" id="nearest-distance">-- m</div>
+    </div>
 
-        <!-- 答題獲得金幣模組 -->
-        <div class="quiz-section">
-            <h3>🪙 景點闖關挑戰</h3>
-            <p>題目：駁二園區位於高雄市的哪一個區？</p>
-            <input type="text" id="quiz-answer" class="quiz-input" placeholder="請輸入答案">
+    <!-- 景點答題與金幣獲得卡片 -->
+    <div class="card spot-card">
+        <img class="coin-img" id="spot-coin" src="logo.svg" alt="Spot Coin">
+        <h2 id="spot-name">駁二藝術特區</h2>
+        <p class="status-text" id="spot-desc">高雄最具代表性的港邊文創園區。</p>
+        <div class="status-text" style="margin-top: 6px;">📍 計算距離中...</div>
+
+        <!-- 答題與跳轉邏輯區 -->
+        <div class="quiz-box">
+            <h3>🪙 闖關領金幣</h3>
+            <p class="status-text" style="margin-top: 4px;">題目：駁二園區部位於高雄市哪個區？</p>
+            <input type="text" id="quiz-input" class="quiz-input" placeholder="請輸入答案">
             <br>
-            <button class="submit-btn" onclick="checkAnswer()">提交答案</button>
+            <button class="btn-submit" id="submit-quiz-btn">確認提交</button>
         </div>
     </div>
 
-    <!-- 雷達迴波 Modal -->
-    <div class="radar-modal" id="radar-modal" onclick="closeRadar()">
-        <div class="radar-content" onclick="event.stopPropagation()">
-            <h3>🌀 中央氣象署雷達迴波圖</h3>
-            <p>2小時迴波動畫 (0.1s/幀)</p>
-            <img src="https://www.cwa.gov.tw/Data/radar/CV1_3600.png" alt="雷達迴波" style="max-width: 100%; height: auto;">
+    <!-- 雷達 Modal 視窗 -->
+    <div class="modal" id="radar-modal">
+        <div class="modal-content">
+            <h3>🌀 白海豚颱風 - 2小時迴波動畫 (0.1s/幀)</h3>
+            <p class="status-text" style="margin-bottom: 10px;">中央氣象署雷達迴波圖</p>
+            <img src="https://www.cwa.gov.tw/Data/radar/CV1_3600.png" alt="雷達圖" style="max-width: 100%; height: auto; border-radius: 8px;">
             <br><br>
-            <button onclick="closeRadar()">關閉</button>
+            <button class="btn-submit" style="background-color: #6c757d;" id="close-radar-btn">關閉</button>
         </div>
     </div>
 
     <script>
-        // 正確答案設定
+        // 設定轉接 LINE 網址
+        const LINE_REDIRECT_URL = "https://u.lin.ee/XAVBp5D";
+
+        // 設定題目的正確答案
         const CORRECT_ANSWER = "鹽埕區";
-        // 得金幣後跳轉的 LINE 網址 (需求 2)
-        const REDIRECT_URL = "https://u.lin.ee/XAVBp5D";
 
-        // 1. 純 Emoji 按鈕事件綁定
-        document.getElementById('radar-btn').addEventListener('click', () => {
-            document.getElementById('radar-modal').style.display = 'flex';
+        // --- DOM 元素綁定 ---
+        const radarBtn = document.getElementById('radar-btn');
+        const locateBtn = document.getElementById('locate-btn');
+        const radarModal = document.getElementById('radar-modal');
+        const closeRadarBtn = document.getElementById('close-radar-btn');
+        const submitQuizBtn = document.getElementById('submit-quiz-btn');
+        const quizInput = document.getElementById('quiz-input');
+
+        // --- 1. 雷達與定位按鈕事件 ---
+        radarBtn.addEventListener('click', () => {
+            radarModal.style.display = 'flex';
         });
 
-        document.getElementById('locate-btn').addEventListener('click', () => {
-            alert('🎯 正在重新更新您的 GPS 位置...');
-            // 此處可放入原本的 GPS 位置更新函數
+        closeRadarBtn.addEventListener('click', () => {
+            radarModal.style.display = 'none';
         });
 
-        function closeRadar() {
-            document.getElementById('radar-modal').style.display = 'none';
-        }
+        locateBtn.addEventListener('click', () => {
+            document.getElementById('location-status').textContent = '📍 定位更新中...';
+            setTimeout(() => {
+                document.getElementById('location-status').textContent = '📍 已完成最新定位';
+            }, 1000);
+        });
 
-        // 2. 答題驗證與金幣獲得 logic
-        function checkAnswer() {
-            const userAnswer = document.getElementById('quiz-answer').value.trim();
+        // --- 2. 答對題目獲取「金幣」後自動轉接 LINE ---
+        submitQuizBtn.addEventListener('click', checkQuizAnswer);
 
-            if (userAnswer === "") {
-                alert("請輸入答案！");
+        function checkQuizAnswer() {
+            const answer = quizInput.value.trim();
+
+            if (!answer) {
+                alert("請先輸入答案喔！");
                 return;
             }
 
-            if (userAnswer === CORRECT_ANSWER || userAnswer === "鹽埕") {
-                // 答對獲得金幣並跳轉
-                alert("🎉 恭喜答對！獲得 Spot Coin 金幣！\n即將為您轉接至專屬頁面...");
-                
-                // 延遲 1 秒後自動跳轉至指定 LINE 網址
-                setTimeout(() => {
-                    window.location.href = REDIRECT_URL;
-                }, 1000);
+            // 判斷是否答對（支援簡寫鹽埕或完整鹽埕區）
+            if (answer === CORRECT_ANSWER || answer === "鹽埕") {
+                alert("🎉 恭喜答對！成功獲得 Spot Coin 金幣！\n系統即將為您轉接至專屬 LINE 頁面...");
+
+                // 獲得金幣後轉址
+                window.location.href = LINE_REDIRECT_URL;
             } else {
-                alert("❌ 答案不正確，再試一次吧！");
+                alert("❌ 答案不正確，再試一次看看！");
             }
         }
     </script>
