@@ -69,9 +69,12 @@
             border: 2px solid #ffffff; display: flex; justify-content: space-between; align-items: center;
         }
 
-        .brand-container { display: flex; flex-direction: column; align-items: flex-start; }
+        .brand-container { display: flex; flex-direction: column; align-items: flex-start; max-width: 55%; }
         .brand-title { font-weight: 800; font-size: 0.9rem; color: #ff758c; }
-        .road-name { font-size: 0.68rem; color: #e63946; font-weight: 700; margin-top: 1px; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .road-name { 
+            font-size: 0.72rem; color: #e63946; font-weight: 700; margin-top: 1px; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; 
+        }
 
         .action-tools { display: flex; gap: 6px; align-items: center; flex-wrap: nowrap; }
 
@@ -104,13 +107,19 @@
         .progress-bar-bg { width: 100%; height: 10px; background: #e9ecef; border-radius: 10px; margin-top: 8px; overflow: hidden; }
         .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--pastel-pink), var(--pastel-yellow)); border-radius: 10px; transition: width 0.5s ease; }
 
-        .food-icon-wrapper { display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        /* 📍 能量球地標樣式 */
+        .food-icon-wrapper { display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1500 !important; }
         .food-badge {
-            width: 42px; height: 42px; background: #ffffff; border: 2px solid #ffb7c5;
+            width: 44px; height: 44px; background: #ffffff; border: 2.5px solid #ffb7c5;
             border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.18); transition: transform 0.15s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25); transition: transform 0.15s ease;
+            animation: float 2s infinite ease-in-out;
         }
-        .food-badge:active { transform: scale(0.8); }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .food-badge:active { transform: scale(0.85); }
         .food-icon-img { width: 28px; height: 28px; object-fit: contain; }
 
         .player-avatar {
@@ -304,6 +313,15 @@
             { key: 'marshmallow', name: '棉花糖', rocketName: '棉花糖一號', planetName: '棉花糖星球', img: 'marshmallow.svg', video: 'marshmallow_planet.mp4' }
         ];
 
+        // 📍 固定自訂地標（您可以在這裡擴充預設地點）
+        const presetLandmarks = [
+            { name: "高雄85大樓", lat: 22.6117, lng: 120.3003, foodKey: "rice" },
+            { name: "中央公園", lat: 22.6238, lng: 120.3013, foodKey: "marshmallow" },
+            { name: "駁二藝術特區", lat: 22.6198, lng: 120.2818, foodKey: "boba" },
+            { name: "美麗島站", lat: 22.6313, lng: 120.3018, foodKey: "latte" },
+            { name: "高雄車站", lat: 22.6380, lng: 120.3020, foodKey: "noodle" }
+        ];
+
         let foodCounts = { rice: 0, noodle: 0, latte: 0, boba: 0, marshmallow: 0 };
         let launchedRockets = { rice: false, noodle: false, latte: false, boba: false, marshmallow: false };
         let activeFoodMarkers = [];
@@ -313,7 +331,6 @@
         let map, playerMarker;
         let totalDistanceMeters = 0;
         let previousPosition = null;
-        let lastScanPosition = null;
 
         // 地名防抖變數
         let lastGeocodeTime = 0;
@@ -334,21 +351,28 @@
             });
             playerMarker = L.marker(userCoords, { icon: playerIcon }).addTo(map);
 
+            // 載入固定預設地標
+            initPresetLandmarks();
+
             checkUrlParamsAndInit();
         }
 
-        // 📍 防抖順暢即時地名抓取
+        // 📍 載入預設定標
+        function initPresetLandmarks() {
+            presetLandmarks.forEach(item => {
+                spawnFoodAtLocation(item.lat, item.lng, item.name, item.foodKey);
+            });
+        }
+
+        // 📍 逆地理編碼：格式改回「縣市 鄉鎮市區 路名/街/巷」
         async function fetchRoadName(lat, lng) {
             const now = Date.now();
             
-            // 節流保護：10秒內不重複請求
+            // 防抖：10秒間隔
             if (now - lastGeocodeTime < 10000) return;
             
-            // 距離保護：移動未滿 25 公尺不重複發請求
-            if (lastGeocodeCoords) {
-                const dist = getDistance(lastGeocodeCoords[0], lastGeocodeCoords[1], lat, lng);
-                if (dist < 25) return;
-            }
+            // 距離限制：移動超過25m才請求
+            if (lastGeocodeCoords && getDistance(lastGeocodeCoords[0], lastGeocodeCoords[1], lat, lng) < 25) return;
 
             lastGeocodeTime = now;
             lastGeocodeCoords = [lat, lng];
@@ -358,9 +382,15 @@
                 const data = await res.json();
                 
                 if (data && data.address) {
-                    const addr = data.address;
-                    const road = addr.road || addr.pedestrian || addr.suburb || addr.neighbourhood || addr.city || '探索區域';
-                    document.getElementById('road-name').innerText = `📍 ${road}`;
+                    const a = data.address;
+                    
+                    // 組合：縣市 鄉鎮市區 路名
+                    const city = a.city || a.county || a.state || '';
+                    const district = a.suburb || a.town || a.district || a.city_district || '';
+                    const road = a.road || a.pedestrian || a.street || a.village || '';
+
+                    const fullAddress = `${city} ${district} ${road}`.trim();
+                    document.getElementById('road-name').innerText = `📍 ${fullAddress || '探索區域'}`;
                 }
             } catch (err) {
                 console.error('地名取得失敗', err);
@@ -370,20 +400,13 @@
         function updatePlayerPosition(coords) {
             userCoords = coords;
 
-            // 觸發地名更新
+            // 1. 抓取完整地名
             fetchRoadName(coords[0], coords[1]);
 
-            if (!lastScanPosition) {
-                lastScanPosition = coords;
-                autoScanNearbyRealPlaces();
-            } else {
-                const walkedDist = getDistance(lastScanPosition[0], lastScanPosition[1], coords[0], coords[1]);
-                if (walkedDist >= 50) {
-                    lastScanPosition = coords;
-                    autoScanNearbyRealPlaces();
-                }
-            }
+            // 2. 隨時保底周圍生成能量球（確保畫面上一定有）
+            generateNearbyRandomFoods(coords[0], coords[1]);
 
+            // 3. 計算里程與移動
             if (previousPosition) {
                 const moved = getDistance(previousPosition[0], previousPosition[1], coords[0], coords[1]);
                 if (moved >= 3) {
@@ -397,77 +420,38 @@
 
             playerMarker.setLatLng(coords);
             document.getElementById('total-walked').innerText = `🚶 ${(totalDistanceMeters / 1000).toFixed(2)} km`;
+            
+            // 4. 更新下方的最近目標距離
+            updateNearestFoodDistance();
         }
 
-        async function autoScanNearbyRealPlaces() {
-            if (!userCoords) return;
-            const [lat, lng] = userCoords;
-            const radius = 300;
+        // 📍 保底機制：在玩家四周隨機生成能量球（防止網路/API失敗無球可拿）
+        function generateNearbyRandomFoods(lat, lng) {
+            if (activeFoodMarkers.length >= 8) return; // 保持地圖上有 8 個點以上
 
-            const query = `
-                [out:json][timeout:10];
-                (
-                  node["shop"="convenience"](around:${radius},${lat},${lng});
-                  node["shop"="beverage"](around:${radius},${lat},${lng});
-                  node["shop"="bakery"](around:${radius},${lat},${lng});
-                  node["shop"="pastry"](around:${radius},${lat},${lng});
-                  node["amenity"="restaurant"](around:${radius},${lat},${lng});
-                  node["amenity"="fast_food"](around:${radius},${lat},${lng});
-                  node["amenity"="cafe"](around:${radius},${lat},${lng});
-                );
-                out body 25;
-            `;
-
-            try {
-                const res = await fetch('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(query));
-                const data = await res.json();
+            const countToSpawn = 8 - activeFoodMarkers.length;
+            for (let i = 0; i < countToSpawn; i++) {
+                // 在周圍 100 ~ 300 公尺生成
+                const rLat = lat + (Math.random() - 0.5) * 0.005;
+                const rLng = lng + (Math.random() - 0.5) * 0.005;
+                const randomFood = foodTypes[Math.floor(Math.random() * foodTypes.length)];
                 
-                if (data && data.elements) {
-                    data.elements.forEach(place => {
-                        if (loadedPlaceIds.has(place.id)) return;
-                        
-                        const foodKey = classifyPlaceToFoodKey(place);
-                        if (foodKey) {
-                            loadedPlaceIds.add(place.id);
-                            spawnFoodAtRealLocation(place.lat, place.lon, place.tags?.name || '在地名店', foodKey);
-                        }
-                    });
-                }
-            } catch (err) {
-                console.error('API 讀取失敗', err);
+                spawnFoodAtLocation(rLat, rLng, `${randomFood.name}點`, randomFood.key);
             }
         }
 
-        function classifyPlaceToFoodKey(place) {
-            const tags = place.tags || {};
-            const shop = tags.shop || '';
-            const amenity = tags.amenity || '';
-            const name = tags.name || '';
-
-            if (shop === 'convenience') return 'latte';
-            if (shop === 'beverage' || amenity === 'cafe') return 'boba';
-            if (shop === 'bakery' || shop === 'pastry') return 'marshmallow';
-
-            if (amenity === 'restaurant' || amenity === 'fast_food') {
-                if (name.includes('麵') || name.includes('拉麵') || name.includes('義式') || name.toLowerCase().includes('noodle')) {
-                    return 'noodle';
-                }
-                return 'rice';
-            }
-            return null;
-        }
-
-        function spawnFoodAtRealLocation(lat, lng, shopName, foodKey) {
+        function spawnFoodAtLocation(lat, lng, shopName, foodKey) {
             const food = foodTypes.find(f => f.key === foodKey);
             if (!food) return;
 
             const foodIcon = L.divIcon({
                 className: 'food-icon-wrapper',
                 html: `<div class="food-badge" title="${shopName}"><img src="${food.img}" class="food-icon-img" alt="${food.name}"></div>`,
-                iconSize: [42, 42], iconAnchor: [21, 21]
+                iconSize: [44, 44], iconAnchor: [22, 22]
             });
 
             const marker = L.marker([lat, lng], { icon: foodIcon }).addTo(map);
+            marker.foodData = { lat, lng, shopName, foodKey, foodName: food.name };
 
             marker.on('click', () => {
                 map.removeLayer(marker);
@@ -475,10 +459,40 @@
                 foodCounts[foodKey] = (foodCounts[foodKey] || 0) + 1;
                 showToast(`🎉 於【${shopName}】採集 1 個【${food.name}能量球】！`);
 
+                updateNearestFoodDistance();
                 if (document.getElementById('explore-modal').style.display === 'flex') renderExploreRockets();
             });
 
             activeFoodMarkers.push(marker);
+            updateNearestFoodDistance();
+        }
+
+        function updateNearestFoodDistance() {
+            if (!userCoords || activeFoodMarkers.length === 0) {
+                document.getElementById('target-name').innerText = '搜尋中...';
+                document.getElementById('target-dist').innerText = '-- m';
+                return;
+            }
+
+            let minDist = Infinity;
+            let nearestFood = null;
+
+            activeFoodMarkers.forEach(m => {
+                const dist = getDistance(userCoords[0], userCoords[1], m.foodData.lat, m.foodData.lng);
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearestFood = m.foodData;
+                }
+            });
+
+            if (nearestFood) {
+                document.getElementById('target-name').innerHTML = `📍 ${nearestFood.shopName} (${nearestFood.foodName})`;
+                document.getElementById('target-dist').innerText = `${minDist} m`;
+                
+                // 更新進度條 (預設 300 公尺為滿格)
+                const pct = Math.max(0, Math.min(100, (1 - minDist / 300) * 100));
+                document.getElementById('progress-fill').style.width = `${pct}%`;
+            }
         }
 
         /* 🌀 雷達迴波 */
@@ -518,7 +532,7 @@
                 radarImg.src = currentFrame.url;
                 timeTag.innerText = `▶ 時間：${currentFrame.timeStr}`;
                 radarFrameIndex = (radarFrameIndex + 1) % radarFrames.length;
-            }, 120);
+            }, 150);
         }
 
         function stopRadarAnimation() {
