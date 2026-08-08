@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>TAKAO WALK arr!</title>
     
-    <!-- 🌸 遊戲瀏覽器圖標 -->
     <link rel="icon" href="logo.svg" type="image/svg+xml">
-    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -102,27 +100,31 @@
             position: absolute;
             top: calc(15px + env(safe-area-inset-top, 0px));
             left: 50%; transform: translateX(-50%);
-            z-index: 1000; width: 90%; max-width: 420px;
+            z-index: 1000; width: 92%; max-width: 440px;
             background: var(--pastel-card); backdrop-filter: blur(8px);
-            padding: 12px 18px; border-radius: 20px;
+            padding: 10px 14px; border-radius: 20px;
             box-shadow: 0 8px 20px rgba(180, 160, 150, 0.15);
             border: 2px solid #ffffff;
             display: flex; justify-content: space-between; align-items: center;
         }
 
         .brand-container { display: flex; flex-direction: column; align-items: flex-start; }
-        .brand-title { font-weight: 800; font-size: 1.05rem; color: #ff758c; }
-        .road-name { font-size: 0.72rem; color: #e63946; font-weight: 700; margin-top: 3px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .brand-title { font-weight: 800; font-size: 0.95rem; color: #ff758c; }
+        .road-name { font-size: 0.7rem; color: #e63946; font-weight: 700; margin-top: 2px; max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .bgm-btn {
-            background: #ffffff; border: 2px solid #ffccd5; border-radius: 50%;
-            width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
-            font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        .action-tools { display: flex; gap: 6px; align-items: center; }
+
+        .icon-btn {
+            background: #ffffff; border: 1.5px solid #ffccd5; border-radius: 12px;
+            padding: 6px 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; font-weight: 800; color: #5c544d; cursor: pointer;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06); transition: transform 0.1s;
         }
+        .icon-btn:active { transform: scale(0.92); }
 
         .dist-tracker {
-            font-size: 0.85rem; background: #fff0f3; padding: 6px 12px;
-            border-radius: 14px; color: #ff4d6d; font-weight: 800; border: 1px solid #ffccd5;
+            font-size: 0.8rem; background: #fff0f3; padding: 5px 10px;
+            border-radius: 12px; color: #ff4d6d; font-weight: 800; border: 1px solid #ffccd5;
         }
 
         .hud-bottom {
@@ -180,7 +182,6 @@
             to { transform: translateY(0); }
         }
 
-        /* 上方 3/4 區域：金幣展示 */
         .pikmin-top-stage {
             flex: 1.2; position: relative; display: flex; flex-direction: column;
             justify-content: center; align-items: center;
@@ -207,7 +208,6 @@
             50% { transform: translateY(-10px) rotate(3deg); }
         }
 
-        /* 下方資訊欄與答題區 */
         .pikmin-bottom-sheet {
             background: #ffffff; padding: 24px; border-radius: 30px 30px 0 0;
             box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.05); border-top: 1px solid #ffeef0;
@@ -223,7 +223,6 @@
             border: 1px solid #ffccd5;
         }
 
-        /* 答題卡 */
         .quiz-container {
             background: #faf8f5; border-radius: 20px; padding: 16px;
             border: 1.5px dashed #ffd3b6; margin-top: 6px;
@@ -250,6 +249,31 @@
             background: #e8f5e9; color: #2e7d32; padding: 16px; border-radius: 20px;
             font-weight: 800; text-align: center; font-size: 1rem; border: 1px solid #a5d6a7;
         }
+
+        /* 🌀 颱風雷達迴波 Modal */
+        .radar-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh;
+            z-index: 2800; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px);
+            justify-content: center; align-items: center; padding: 20px;
+        }
+
+        .radar-card {
+            background: #ffffff; width: 100%; max-width: 400px; border-radius: 24px;
+            padding: 18px; display: flex; flex-direction: column; align-items: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3); position: relative;
+        }
+
+        .radar-header { display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 12px; }
+        .radar-title { font-weight: 800; color: #023e8a; font-size: 1.05rem; }
+        .radar-time { font-size: 0.75rem; color: #6c757d; margin-top: 2px; }
+        
+        .radar-img-box {
+            width: 100%; height: 300px; background: #000; border-radius: 16px;
+            overflow: hidden; display: flex; justify-content: center; align-items: center;
+            position: relative;
+        }
+
+        .radar-img-box img { width: 100%; height: 100%; object-fit: contain; }
 
         /* 通用彈窗與 Toast */
         .modal {
@@ -297,23 +321,44 @@
 
     <div id="map"></div>
 
+    <!-- HUD 頂部列 -->
     <div class="hud-top">
         <div class="brand-container">
-            <div class="brand-title" id="brand-title">🌸 驗證中... 冒險家</div>
+            <div class="brand-title" id="brand-title">🌸 冒險家</div>
             <div class="road-name" id="road-name">📍 定位中...</div>
         </div>
-        <div id="auth-action-area" style="display: flex; gap: 8px; align-items: center;">
-            <button class="bgm-btn" id="bgm-btn" onclick="toggleBGM()">🔇</button>
+        <div class="action-tools">
+            <button class="icon-btn" id="radar-btn" onclick="openRadarModal()">🌀 雷達</button>
+            <button class="icon-btn" id="recenter-btn" onclick="recenterMap()">🎯 定位</button>
+            <button class="icon-btn" id="bgm-btn" onclick="toggleBGM()">🎵</button>
             <div class="dist-tracker" id="total-walked">🚶 0.00 km</div>
         </div>
     </div>
 
+    <!-- HUD 底部列 -->
     <div class="hud-bottom">
         <div class="target-title">距離最近的冒險點</div>
         <div class="target-name" id="target-name">搜尋中...</div>
         <div class="target-dist" id="target-dist">-- m</div>
         <div class="progress-bar-bg">
             <div class="progress-bar-fill" id="progress-fill"></div>
+        </div>
+    </div>
+
+    <!-- 🌀 颱風雷達迴波彈窗 -->
+    <div class="radar-modal" id="radar-modal" onclick="closeRadarModal(event)">
+        <div class="radar-card" onclick="event.stopPropagation()">
+            <div class="radar-header">
+                <div>
+                    <div class="radar-title">🌀 白海豚颱風 - 雷達迴波</div>
+                    <div class="radar-time" id="radar-time-tag">更新時間計算中...</div>
+                </div>
+                <button class="pikmin-close-btn" style="position:static;" onclick="closeRadarModal()">✕</button>
+            </div>
+            <div class="radar-img-box">
+                <img id="radar-img" src="" alt="中央氣象署雷達迴波圖" onerror="this.src=''; showToast('⚠️ 氣象署圖像生成中，請稍後重試');">
+            </div>
+            <button class="modal-btn" style="width:100%; margin-top:12px;" onclick="refreshRadarImage()">🔄 手動刷新</button>
         </div>
     </div>
 
@@ -330,9 +375,7 @@
                 <div class="pikmin-spot-desc" id="pikmin-spot-desc">景點簡介說明</div>
                 <div class="pikmin-dist-badge" id="pikmin-dist-badge">📍 計算距離中...</div>
                 
-                <div class="quiz-container" id="quiz-container">
-                    <!-- 動態渲染問答題區塊 -->
-                </div>
+                <div class="quiz-container" id="quiz-container"></div>
             </div>
         </div>
     </div>
@@ -354,11 +397,10 @@
 
         let currentLineId = null;
         let currentName = null;
-        let isBgmPlaying = false;
+        let isBgmPlaying = true; // 🎵 預設開啟 BGM
         let lastGeocodeCoords = null;
         let activeSpot = null;
 
-        // 🟡 景點資料庫與問答庫（選項預設包含正確解答標記，每次開啟隨機排序）
         const spots = [
             { 
                 id: 1, name: '奇美博物館', lat: 22.9348, lng: 120.2260, desc: '西洋藝術與古典城堡建築', icon: 'coin_chimei.png', collected: false,
@@ -402,13 +444,27 @@
         let totalDistanceMeters = 0;
         let previousPosition = null;
 
-        function startBGM() {
+        // 🎵 嘗試自動播放 BGM
+        function tryAutoPlayBGM() {
             const bgm = document.getElementById('bgm');
             const btn = document.getElementById('bgm-btn');
-            bgm.volume = 0.08; 
+            if (!bgm) return;
+            bgm.volume = 0.08;
             bgm.play().then(() => {
-                isBgmPlaying = true; btn.innerText = '🎵';
-            }).catch(() => {});
+                isBgmPlaying = true;
+                if (btn) btn.innerText = '🎵';
+            }).catch(() => {
+                // 若受限於瀏覽器自動播放政策，觸發全局點擊自動補放
+                const unlockAudio = () => {
+                    bgm.play();
+                    isBgmPlaying = true;
+                    if (btn) btn.innerText = '🎵';
+                    document.removeEventListener('click', unlockAudio);
+                    document.removeEventListener('touchstart', unlockAudio);
+                };
+                document.addEventListener('click', unlockAudio);
+                document.addEventListener('touchstart', unlockAudio);
+            });
         }
 
         function toggleBGM() {
@@ -417,6 +473,40 @@
             if (isBgmPlaying) { bgm.pause(); btn.innerText = '🔇'; }
             else { bgm.volume = 0.08; bgm.play(); btn.innerText = '🎵'; }
             isBgmPlaying = !isBgmPlaying;
+        }
+
+        /* 🌀 中央氣象署雷達迴波圖動態網址計算（無條件捨去至10分鐘減20分鐘） */
+        function getCwaRadarUrl() {
+            const now = new Date();
+            const minutes10 = Math.floor(now.getMinutes() / 10) * 10;
+            now.setMinutes(minutes10 - 20); // 減掉 20 分鐘
+
+            const YYYY = now.getFullYear();
+            const MM = String(now.getMonth() + 1).padStart(2, '0');
+            const DD = String(now.getDate()).padStart(2, '0');
+            const HH = String(now.getHours()).padStart(2, '0');
+            const mm = String(now.getMinutes()).padStart(2, '0');
+
+            const timeString = `${YYYY}-${MM}-${DD} ${HH}:${mm}`;
+            const imgUrl = `https://www.cwa.gov.tw/Data/radar/CV1_3600_${YYYY}${MM}${DD}${HH}${mm}.png`;
+
+            return { url: imgUrl, timeStr: timeString };
+        }
+
+        function refreshRadarImage() {
+            const radarData = getCwaRadarUrl();
+            document.getElementById('radar-img').src = radarData.url + '?t=' + new Date().getTime();
+            document.getElementById('radar-time-tag').innerText = `觀測時間：${radarData.timeStr}`;
+        }
+
+        function openRadarModal() {
+            refreshRadarImage();
+            document.getElementById('radar-modal').style.display = 'flex';
+        }
+
+        function closeRadarModal(e) {
+            if (e && e.target !== e.currentTarget && !e.target.classList.contains('pikmin-close-btn')) return;
+            document.getElementById('radar-modal').style.display = 'none';
         }
 
         function fetchRoadName(lat, lng) {
@@ -440,14 +530,15 @@
         function initMap() {
             const taiwanBounds = L.latLngBounds(L.latLng(20.5, 118.0), L.latLng(26.5, 124.0));
 
+            // 🎯 地圖預設周圍約 250 公尺（Zoom Level 16）
             map = L.map('map', {
                 zoomControl: false, attributionControl: false,
-                minZoom: 7, maxZoom: 16,
+                minZoom: 7, maxZoom: 18,
                 maxBounds: taiwanBounds, maxBoundsViscosity: 1.0
-            }).setView(userCoords, 13);
+            }).setView(userCoords, 16);
 
             L.tileLayer('https://api.maptiler.com/maps/aquarelle-v4/256/{z}/{x}/{y}.png?key=DDhwtFjCbEWiteavezOK', {
-                minZoom: 7, maxZoom: 16, noWrap: true
+                minZoom: 7, maxZoom: 18, noWrap: true
             }).addTo(map);
 
             const playerIcon = L.divIcon({
@@ -457,7 +548,6 @@
             });
             playerMarker = L.marker(userCoords, { icon: playerIcon }).addTo(map);
 
-            // 🪙 金幣點擊事件绑定
             spots.forEach(spot => {
                 const icon = L.divIcon({
                     className: 'coin-icon-wrapper', 
@@ -469,15 +559,24 @@
             });
 
             checkUrlParamsAndInit();
+
+            // 每 10 分鐘刷新一次雷達圖
+            setInterval(refreshRadarImage, 10 * 60 * 1000);
         }
 
-        /* 🍄 開啟皮克敏風格頁面 */
+        /* 🎯 重置鏡頭回到使用者定位 */
+        function recenterMap() {
+            if (map && userCoords) {
+                map.flyTo(userCoords, 16, { animate: true, duration: 0.8 });
+                showToast('🎯 已回到目前定位點');
+            }
+        }
+
         function openPikminModal(spot) {
             activeSpot = spot;
             document.getElementById('pikmin-coin-img').src = spot.icon;
             document.getElementById('pikmin-spot-title').innerText = spot.name;
             document.getElementById('pikmin-spot-desc').innerText = spot.desc;
-            
             renderPikminQuiz();
             document.getElementById('pikmin-modal').style.display = 'flex';
         }
@@ -488,7 +587,6 @@
             activeSpot = null;
         }
 
-        /* 渲染皮克敏問答內容 */
         function renderPikminQuiz() {
             if (!activeSpot) return;
 
@@ -498,13 +596,11 @@
 
             badge.innerText = dist > 1000 ? `📍 距離 ${(dist/1000).toFixed(1)} km` : `📍 距離 ${dist} m`;
 
-            // 已收集狀態
             if (activeSpot.collected) {
                 container.innerHTML = `<div class="collected-tag">✨ 已成功回答並領取金幣！</div>`;
                 return;
             }
 
-            // 打亂選項順序（不標註 A/B）
             const shuffledOptions = [...activeSpot.options].sort(() => Math.random() - 0.5);
 
             if (dist <= 50) {
@@ -531,7 +627,6 @@
             }
         }
 
-        /* 答題驗證 */
         function submitAnswer(isCorrect) {
             if (!activeSpot) return;
 
@@ -544,6 +639,7 @@
             if (isCorrect) {
                 activeSpot.collected = true;
                 showToast(`🎉 答對了！成功領取 ${activeSpot.name} 金幣！`);
+                saveLocalState();
                 syncDataToGAS();
                 updateProgressUI();
                 renderPikminQuiz();
@@ -553,49 +649,79 @@
         }
 
         function loginWithLine() {
-            startBGM();
+            tryAutoPlayBGM();
             const redirectUri = encodeURIComponent(GAS_API_URL);
             const lineAuthUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CHANNEL_ID}&redirect_uri=${redirectUri}&state=takaowalk&scope=profile%20openid`;
             window.location.href = lineAuthUrl;
         }
 
         function skipLoginForTesting() {
-            startBGM();
+            tryAutoPlayBGM();
             document.getElementById('login-overlay').style.display = 'none';
             currentLineId = 'test_guest';
             currentName = '測試玩家';
-            document.getElementById('brand-title').innerText = `🌸 ${currentName} 冒險家`;
+            document.getElementById('brand-title').innerText = `🌸 ${currentName}`;
             totalDistanceMeters = 0;
             document.getElementById('total-walked').innerText = `🚶 0.00 km`;
+            saveLocalState();
             updateProgressUI();
             startGeolocation();
             showToast('⚡ 已進入測試模式');
         }
 
+        /* 本地快取與網址清理（解決 LINE 重複登入卡死 BUG） */
         function checkUrlParamsAndInit() {
+            tryAutoPlayBGM();
             const params = new URLSearchParams(window.location.search);
+
             if (params.has('line_id')) {
-                document.getElementById('login-overlay').style.display = 'none';
                 currentLineId = params.get('line_id');
                 currentName = params.get('name') || '冒險家';
                 const savedDist = parseFloat(params.get('dist') || '0');
                 const savedSpots = (params.get('spots') || '').split(',');
 
-                document.getElementById('brand-title').innerText = `🌸 ${currentName} 冒險家`;
                 totalDistanceMeters = savedDist * 1000;
-                document.getElementById('total-walked').innerText = `🚶 ${savedDist.toFixed(2)} km`;
+                spots.forEach(s => { if (savedSpots.includes(s.id.toString())) s.collected = true; });
 
-                spots.forEach(spot => {
-                    if (savedSpots.includes(spot.id.toString())) {
-                        spot.collected = true;
-                    }
-                });
-
-                updateProgressUI();
-                startGeolocation();
+                saveLocalState();
+                // 🧹 乾淨化 URL，移除授權參數防範重複轉址 BUG
+                window.history.replaceState({}, document.title, window.location.pathname);
+                enterGameUI();
             } else {
-                document.getElementById('login-overlay').style.display = 'flex';
+                // 讀取 LocalStorage 快取
+                const cachedUser = localStorage.getItem('takaowalk_user');
+                if (cachedUser) {
+                    const userData = JSON.parse(cachedUser);
+                    currentLineId = userData.lineId;
+                    currentName = userData.name;
+                    totalDistanceMeters = userData.distMeters || 0;
+                    if (userData.collectedSpots) {
+                        spots.forEach(s => { if (userData.collectedSpots.includes(s.id)) s.collected = true; });
+                    }
+                    enterGameUI();
+                } else {
+                    document.getElementById('login-overlay').style.display = 'flex';
+                }
             }
+        }
+
+        function saveLocalState() {
+            const collectedIds = spots.filter(s => s.collected).map(s => s.id);
+            const userCache = {
+                lineId: currentLineId,
+                name: currentName,
+                distMeters: totalDistanceMeters,
+                collectedSpots: collectedIds
+            };
+            localStorage.setItem('takaowalk_user', JSON.stringify(userCache));
+        }
+
+        function enterGameUI() {
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('brand-title').innerText = `🌸 ${currentName}`;
+            document.getElementById('total-walked').innerText = `🚶 ${(totalDistanceMeters / 1000).toFixed(2)} km`;
+            updateProgressUI();
+            startGeolocation();
         }
 
         function syncDataToGAS() {
@@ -621,6 +747,7 @@
                 if (moved >= 3) {
                     totalDistanceMeters += moved;
                     previousPosition = coords;
+                    saveLocalState();
                     syncDataToGAS();
                 }
             } else {
@@ -646,11 +773,7 @@
                 document.getElementById('target-dist').innerText = minDist > 1000 ? `${(minDist / 1000).toFixed(1)} km` : `${minDist} m`;
             }
 
-            // 如果皮克敏視窗開著，動態更新距離與按鈕狀態
-            if (activeSpot) {
-                renderPikminQuiz();
-            }
-
+            if (activeSpot) renderPikminQuiz();
             updateProgressUI();
         }
 
