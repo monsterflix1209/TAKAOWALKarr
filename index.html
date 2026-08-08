@@ -356,9 +356,8 @@
                 <button class="pikmin-close-btn" style="position:static;" onclick="closeRadarModal()">✕</button>
             </div>
             <div class="radar-img-box">
-                <img id="radar-img" src="" alt="中央氣象署雷達迴波圖" onerror="this.src=''; showToast('⚠️ 氣象署圖像生成中，請稍後重試');">
+                <img id="radar-img" alt="中央氣象署雷達迴波圖">
             </div>
-            <button class="modal-btn" style="width:100%; margin-top:12px;" onclick="refreshRadarImage()">🔄 手動刷新</button>
         </div>
     </div>
 
@@ -397,7 +396,7 @@
 
         let currentLineId = null;
         let currentName = null;
-        let isBgmPlaying = true; // 🎵 預設開啟 BGM
+        let isBgmPlaying = true;
         let lastGeocodeCoords = null;
         let activeSpot = null;
 
@@ -444,7 +443,6 @@
         let totalDistanceMeters = 0;
         let previousPosition = null;
 
-        // 🎵 嘗試自動播放 BGM
         function tryAutoPlayBGM() {
             const bgm = document.getElementById('bgm');
             const btn = document.getElementById('bgm-btn');
@@ -454,7 +452,6 @@
                 isBgmPlaying = true;
                 if (btn) btn.innerText = '🎵';
             }).catch(() => {
-                // 若受限於瀏覽器自動播放政策，觸發全局點擊自動補放
                 const unlockAudio = () => {
                     bgm.play();
                     isBgmPlaying = true;
@@ -475,11 +472,10 @@
             isBgmPlaying = !isBgmPlaying;
         }
 
-        /* 🌀 中央氣象署雷達迴波圖動態網址計算（無條件捨去至10分鐘減20分鐘） */
         function getCwaRadarUrl() {
             const now = new Date();
             const minutes10 = Math.floor(now.getMinutes() / 10) * 10;
-            now.setMinutes(minutes10 - 20); // 減掉 20 分鐘
+            now.setMinutes(minutes10 - 20);
 
             const YYYY = now.getFullYear();
             const MM = String(now.getMonth() + 1).padStart(2, '0');
@@ -493,9 +489,17 @@
             return { url: imgUrl, timeStr: timeString };
         }
 
+        // 自動刷新氣象圖（阻斷死鎖迴圈）
         function refreshRadarImage() {
             const radarData = getCwaRadarUrl();
-            document.getElementById('radar-img').src = radarData.url + '?t=' + new Date().getTime();
+            const img = document.getElementById('radar-img');
+
+            img.onerror = function() {
+                this.onerror = null;
+                showToast('⚠️ 氣象署圖像生成中，請稍後重試');
+            };
+
+            img.src = radarData.url + '?t=' + new Date().getTime();
             document.getElementById('radar-time-tag').innerText = `觀測時間：${radarData.timeStr}`;
         }
 
@@ -530,7 +534,6 @@
         function initMap() {
             const taiwanBounds = L.latLngBounds(L.latLng(20.5, 118.0), L.latLng(26.5, 124.0));
 
-            // 🎯 地圖預設周圍約 250 公尺（Zoom Level 16）
             map = L.map('map', {
                 zoomControl: false, attributionControl: false,
                 minZoom: 7, maxZoom: 18,
@@ -560,11 +563,10 @@
 
             checkUrlParamsAndInit();
 
-            // 每 10 分鐘刷新一次雷達圖
+            // 定時每 10 分鐘自動重整圖層
             setInterval(refreshRadarImage, 10 * 60 * 1000);
         }
 
-        /* 🎯 重置鏡頭回到使用者定位 */
         function recenterMap() {
             if (map && userCoords) {
                 map.flyTo(userCoords, 16, { animate: true, duration: 0.8 });
@@ -669,7 +671,6 @@
             showToast('⚡ 已進入測試模式');
         }
 
-        /* 本地快取與網址清理（解決 LINE 重複登入卡死 BUG） */
         function checkUrlParamsAndInit() {
             tryAutoPlayBGM();
             const params = new URLSearchParams(window.location.search);
@@ -684,11 +685,9 @@
                 spots.forEach(s => { if (savedSpots.includes(s.id.toString())) s.collected = true; });
 
                 saveLocalState();
-                // 🧹 乾淨化 URL，移除授權參數防範重複轉址 BUG
                 window.history.replaceState({}, document.title, window.location.pathname);
                 enterGameUI();
             } else {
-                // 讀取 LocalStorage 快取
                 const cachedUser = localStorage.getItem('takaowalk_user');
                 if (cachedUser) {
                     const userData = JSON.parse(cachedUser);
