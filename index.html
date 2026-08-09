@@ -729,6 +729,11 @@
                 syncDataToGAS();
                 updateProgressUI();
                 renderPikminQuiz();
+
+                // 答對後延遲 1.5 秒自動開啟指定 LINE 連結
+                setTimeout(() => {
+                    window.location.href = 'https://u.lin.ee/XAVBp5D';
+                }, 1500);
             } else {
                 showToast('❌ 答錯囉，再想看看！');
             }
