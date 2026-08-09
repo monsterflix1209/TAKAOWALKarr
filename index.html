@@ -329,8 +329,8 @@
             <div class="road-name" id="road-name">📍 定位中...</div>
         </div>
         <div class="action-tools">
-            <button class="icon-btn" id="radar-btn" onclick="openRadarModal()">🌀</button>
-            <button class="icon-btn" id="recenter-btn" onclick="recenterMap()">🎯</button>
+            <button class="icon-btn" id="radar-btn" onclick="openRadarModal()">🌀 雷達</button>
+            <button class="icon-btn" id="recenter-btn" onclick="recenterMap()">🎯 定位</button>
             <button class="icon-btn" id="bgm-btn" onclick="toggleBGM()">🎵</button>
             <div class="dist-tracker" id="total-walked">🚶 0.00 km</div>
         </div>
@@ -689,7 +689,7 @@
 
             const shuffledOptions = [...activeSpot.options].sort(() => Math.random() - 0.5);
 
-            if (dist <= 50) {
+            if (dist <= 300) {
                 container.innerHTML = `
                     <div class="quiz-q-title">❓ ${activeSpot.q}</div>
                     <div class="quiz-options-group">
@@ -707,7 +707,7 @@
                         `).join('')}
                     </div>
                     <div style="color: #ff4d6d; font-size: 0.8rem; font-weight: 700; text-align: center; margin-top: 10px;">
-                        🚶 請靠近至 50 公尺內（目前 ${dist}m）才能答題領取金幣！
+                        🚶 請靠近至 300 公尺內（目前 ${dist}m）才能答題領取金幣！
                     </div>
                 `;
             }
@@ -717,8 +717,8 @@
             if (!activeSpot) return;
 
             const dist = getDistance(userCoords[0], userCoords[1], activeSpot.lat, activeSpot.lng);
-            if (dist > 50) {
-                showToast('🚶 您距離太遠囉！請靠近至 50m 內再試！');
+            if (dist > 300) {
+                showToast('🚶 您距離太遠囉！請靠近至 300m 內再試！');
                 return;
             }
 
