@@ -317,7 +317,6 @@
 <body>
 
     <script>
-        // 解除 GAS iframe 嵌套
         if (window.top !== window.self) {
             try { window.top.location.href = window.location.href; } catch(e) {}
         }
@@ -385,7 +384,7 @@
         <div class="pikmin-card" onclick="event.stopPropagation()">
             <div class="pikmin-top-stage">
                 <button class="pikmin-close-btn" onclick="closePikminModal()">✕</button>
-                <div id="pikmin-media-box" style="width:100%; display:flex; justify-content:center;"></div>
+                <div id="pikmin-media-box" style="width:100%; display:flex; justify-content:center; align-items:center;"></div>
             </div>
             
             <div class="pikmin-bottom-sheet">
@@ -423,6 +422,19 @@
         let radarFrames = [];
         let radarFrameIndex = 0;
         let radarAnimationTimer = null;
+
+        function getIconHtml(icon, className) {
+            if (icon.includes('.')) {
+                return `<img src="${icon}" class="${className}" alt="">`;
+            }
+            const sizeMap = {
+                'coin-icon-img': '28px',
+                'hud-coin-img': '20px',
+                'pikmin-coin-display': '80px'
+            };
+            const size = sizeMap[className] || '24px';
+            return `<span class="${className}" style="display:inline-flex;justify-content:center;align-items:center;font-size:${size};line-height:1;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.2));">${icon}</span>`;
+        }
 
         function updateViewportHeight() {
             const vh = window.innerHeight * 0.01;
@@ -471,20 +483,22 @@
                 q: 'SKM Park 最大特色之一是？',
                 options: [{ text: '鈴鹿賽道樂園', isCorrect: true }, { text: '海洋水族館', isCorrect: false }]
             },
+            
+            /* 🚇 捷運站（已替換為 🚇 Emoji） */
             { 
-                id: 8, name: '三多商圈捷運站', lat: 22.6136, lng: 120.3043, desc: '高雄捷運紅線繁華商圈地標', icon: 'coin_mrt.png', 
+                id: 8, name: '三多商圈捷運站', lat: 22.6136, lng: 120.3043, desc: '高雄捷運紅線繁華商圈地標', icon: '🚇', 
                 photo: 'https://images.unsplash.com/photo-1517649763962-0c623266010b?w=400&q=70', collected: false, noQuiz: true 
             },
             { 
-                id: 9, name: '美麗島捷運站', lat: 22.6314, lng: 120.3019, desc: '光之穹頂絕美藝術轉乘車站', icon: 'coin_mrt.png', 
+                id: 9, name: '美麗島捷運站', lat: 22.6314, lng: 120.3019, desc: '光之穹頂絕美藝術轉乘車站', icon: '🚇', 
                 photo: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400&q=70', collected: false, noQuiz: true 
             },
             { 
-                id: 10, name: '哈瑪星捷運站', lat: 22.6217, lng: 120.2758, desc: '銜接輕軌與哈瑪星鐵道園區樞紐', icon: 'coin_mrt.png', 
+                id: 10, name: '哈瑪星捷運站', lat: 22.6217, lng: 120.2758, desc: '銜接輕軌與哈瑪星鐵道園區樞紐', icon: '🚇', 
                 photo: 'https://images.unsplash.com/photo-1541888946425-d0fbb186a5b2?w=400&q=70', collected: false, noQuiz: true 
             },
             
-            /* 🍱 駁二與鹽埕周邊 30 家精選美食（無照片、免問答） */
+            /* 🍱 駁二與鹽埕周邊美食 */
             { id: 11, name: '鴨肉珍', lat: 22.6231, lng: 120.2818, desc: '經典古早味鴨肉飯與鴨肉切盤', icon: 'coin_pier2.png', collected: false, noQuiz: true },
             { id: 12, name: '鴨肉本', lat: 22.6242, lng: 120.2805, desc: '鹽埕老字號當歸鴨與鴨肉飯', icon: 'coin_pier2.png', collected: false, noQuiz: true },
             { id: 13, name: '港園牛肉麵', lat: 22.6219, lng: 120.2835, desc: '濃郁牛肉拌麵與經典滷味', icon: 'coin_pier2.png', collected: false, noQuiz: true },
@@ -647,7 +661,6 @@
                 }).catch(() => { document.getElementById('road-name').innerText = `📍 高雄探索中`; });
         }
 
-        // 🗺️ 初始化地圖（使用 MapTiler Aquarelle 水彩風格圖資）
         function initMap() {
             updateViewportHeight();
             const taiwanBounds = L.latLngBounds(L.latLng(20.5, 118.0), L.latLng(26.5, 124.0));
@@ -661,7 +674,6 @@
                 maxBoundsViscosity: 1.0
             }).setView(userCoords, 15);
 
-            // 🎨 MapTiler Aquarelle 水彩風格圖資
             L.tileLayer('https://api.maptiler.com/maps/aquarelle-v4/256/{z}/{x}/{y}.png?key=DDhwtFjCbEWiteavezOK', {
                 tileSize: 256,
                 minZoom: 1,
@@ -679,7 +691,7 @@
             spots.forEach(spot => {
                 const icon = L.divIcon({
                     className: 'coin-icon-wrapper', 
-                    html: `<img src="${spot.icon}" class="coin-icon-img" alt="${spot.name}">`,
+                    html: getIconHtml(spot.icon, 'coin-icon-img'),
                     iconSize: [38, 38], iconAnchor: [19, 19]
                 });
                 const marker = L.marker([spot.lat, spot.lng], { icon: icon }).addTo(map);
@@ -703,7 +715,7 @@
             if (spot.photo) {
                 mediaBox.innerHTML = `<img src="${spot.photo}" alt="${spot.name}" class="spot-photo-display">`;
             } else {
-                mediaBox.innerHTML = `<img src="${spot.icon}" alt="Coin" class="pikmin-coin-display">`;
+                mediaBox.innerHTML = getIconHtml(spot.icon, 'pikmin-coin-display');
             }
 
             document.getElementById('pikmin-spot-title').innerText = spot.name;
@@ -925,7 +937,7 @@
             });
 
             if (nearest) {
-                document.getElementById('target-name').innerHTML = `<img src="${nearest.icon}" class="hud-coin-img" alt="${nearest.name}"> ${nearest.name}`;
+                document.getElementById('target-name').innerHTML = `${getIconHtml(nearest.icon, 'hud-coin-img')} ${nearest.name}`;
                 document.getElementById('target-dist').innerText = minDist > 1000 ? `${(minDist / 1000).toFixed(1)} km` : `${minDist} m`;
             }
 
