@@ -443,6 +443,18 @@
                 id: 7, name: 'SKM Park', lat: 22.5815, lng: 120.3300, desc: '美式樂園風的購物與遊樂天堂', icon: 'coin_skmpark.png', collected: false,
                 q: 'SKM Park 最大特色之一是？',
                 options: [{ text: '鈴鹿賽道樂園', isCorrect: true }, { text: '海洋水族館', isCorrect: false }]
+            },
+            { 
+                id: 8, name: '三多商圈捷運站', lat: 22.6136, lng: 120.3043, desc: '高雄捷運紅線繁華商圈地標', icon: 'coin_mrt.png', collected: false,
+                noQuiz: true
+            },
+            { 
+                id: 9, name: '美麗島捷運站', lat: 22.6314, lng: 120.3019, desc: '光之穹頂絕美藝術轉乘車站', icon: 'coin_mrt.png', collected: false,
+                noQuiz: true
+            },
+            { 
+                id: 10, name: '哈瑪星捷運站', lat: 22.6217, lng: 120.2758, desc: '銜接輕軌與哈瑪星鐵道園區樞紐', icon: 'coin_mrt.png', collected: false,
+                noQuiz: true
             }
         ];
 
@@ -490,7 +502,7 @@
             localStorage.setItem('takaowalk_last_pos', JSON.stringify(data));
         }
 
-        // ⚡ 離線時間與距離補算邏輯（包含搭車/開車）
+        // ⚡ 離線時間與距離補算邏輯
         function checkAndApplyOfflineDistance(newCoords) {
             if (offlineChecked) return;
             offlineChecked = true;
@@ -503,11 +515,9 @@
                 const now = Date.now();
                 const timeDiffSec = (now - lastData.time) / 1000;
 
-                // 條件：離線時間介於 30 秒至 24 小時之間
                 if (timeDiffSec >= 30 && timeDiffSec <= 86400) {
                     const distMeters = getDistance(lastData.lat, lastData.lng, newCoords[0], newCoords[1]);
 
-                    // 不限制移動速度，只要移動超過 10 公尺皆採計
                     if (distMeters >= 10) {
                         totalDistanceMeters += distMeters;
                         const addedKm = (distMeters / 1000).toFixed(2);
@@ -521,7 +531,6 @@
             }
         }
 
-        // 離線狀態監聽：視頁面關閉或背景時主動儲存位置
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden' && userCoords) {
                 saveOfflinePos(userCoords);
@@ -683,10 +692,34 @@
             badge.innerText = dist > 1000 ? `📍 距離 ${(dist/1000).toFixed(1)} km` : `📍 距離 ${dist} m`;
 
             if (activeSpot.collected) {
-                container.innerHTML = `<div class="collected-tag">✨ 已成功回答並領取金幣！</div>`;
+                container.innerHTML = `<div class="collected-tag">✨ 已成功打卡並領取金幣！</div>`;
                 return;
             }
 
+            // 🎯 不需要回答問題的站點處理
+            if (activeSpot.noQuiz) {
+                if (dist <= 300) {
+                    container.innerHTML = `
+                        <div class="quiz-q-title">📍 本站點免問答，抵達即可打卡！</div>
+                        <div class="quiz-options-group">
+                            <button class="quiz-opt-btn" onclick="submitAnswer(true)">📍 抵達目的地，直接領取金幣！</button>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div class="quiz-q-title">📍 本站點免問答，抵達即可打卡！</div>
+                        <div class="quiz-options-group">
+                            <button class="quiz-opt-btn disabled" disabled>📍 抵達目的地即可打卡</button>
+                        </div>
+                        <div style="color: #ff4d6d; font-size: 0.8rem; font-weight: 700; text-align: center; margin-top: 10px;">
+                            🚶 請靠近至 300 公尺內（目前 ${dist}m）即可打卡領取！
+                        </div>
+                    `;
+                }
+                return;
+            }
+
+            // ❓ 需要回答問題的景點處理
             const shuffledOptions = [...activeSpot.options].sort(() => Math.random() - 0.5);
 
             if (dist <= 300) {
@@ -724,13 +757,12 @@
 
             if (isCorrect) {
                 activeSpot.collected = true;
-                showToast(`🎉 答對了！成功領取 ${activeSpot.name} 金幣！`);
+                showToast(`🎉 成功領取 ${activeSpot.name} 金幣！`);
                 saveLocalState();
                 syncDataToGAS();
                 updateProgressUI();
                 renderPikminQuiz();
 
-                // 答對後延遲 1.5 秒自動開啟指定 LINE 連結
                 setTimeout(() => {
                     window.location.href = 'https://u.lin.ee/XAVBp5D';
                 }, 1500);
@@ -837,10 +869,7 @@
         function updatePlayerPosition(coords) {
             userCoords = coords;
 
-            // 首次定位觸發離線距離補算
             checkAndApplyOfflineDistance(coords);
-
-            // 當前持續記錄最新座標與時間標記
             saveOfflinePos(coords);
 
             if (previousPosition) {
