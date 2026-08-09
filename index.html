@@ -26,8 +26,8 @@
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             -webkit-tap-highlight-color: transparent;
-            -webkit-text-size-adjust: 100%; /* 防 LINE 文字自動放大 */
-            touch-action: manipulation; /* 鎖定手勢防止誤觸雙擊縮放 */
+            -webkit-text-size-adjust: 100%;
+            touch-action: manipulation;
         }
 
         body, html {
@@ -46,6 +46,7 @@
             width: 100%;
             height: 100%;
             z-index: 1;
+            background-color: #f2efe9;
         }
 
         /* 🔒 登入遮罩 */
@@ -100,7 +101,7 @@
         }
         .test-skip-btn:active { transform: scale(0.96); }
 
-        /* HUD 頂部列 - 自動融入安全邊界 */
+        /* HUD 頂部列 */
         .hud-top {
             position: absolute;
             top: max(12px, env(safe-area-inset-top));
@@ -134,7 +135,7 @@
             white-space: nowrap;
         }
 
-        /* HUD 底部列 - 自動貼合底部選單上緣 */
+        /* HUD 底部列 */
         .hud-bottom {
             position: absolute;
             bottom: max(16px, calc(12px + env(safe-area-inset-bottom)));
@@ -169,7 +170,7 @@
             100% { box-shadow: 0 0 0 0 rgba(58, 134, 255, 0); }
         }
 
-        /* 🍄 景點解鎖視窗 - 修正高度防跑位與擠壓 */
+        /* 🍄 景點解鎖視窗 */
         .pikmin-overlay {
             display: none; position: fixed; top: 0; left: 0;
             width: 100%; height: calc(var(--vh, 1vh) * 100);
@@ -315,8 +316,8 @@
 </head>
 <body>
 
-    <!-- ⚡ 自動修正框架，防止 Google Apps Script 嵌套 Causes layout breakage -->
     <script>
+        // 解除 GAS iframe 嵌套
         if (window.top !== window.self) {
             try { window.top.location.href = window.location.href; } catch(e) {}
         }
@@ -324,7 +325,7 @@
 
     <audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
 
-    <!-- 🔒 滿版登入遮罩 -->
+    <!-- 🔒 登入遮罩 -->
     <div class="login-overlay" id="login-overlay">
         <picture class="bg-cover-picture">
             <source media="(orientation: landscape)" srcset="cover_computer.jpg">
@@ -346,8 +347,8 @@
             <div class="road-name" id="road-name">📍 定位中...</div>
         </div>
         <div class="action-tools">
-            <button class="icon-btn" id="radar-btn" onclick="openRadarModal()">🌀</button>
-            <button class="icon-btn" id="recenter-btn" onclick="recenterMap()">🎯</button>
+            <button class="icon-btn" id="radar-btn" onclick="openRadarModal()">🌀 雷達</button>
+            <button class="icon-btn" id="recenter-btn" onclick="recenterMap()">🎯 定位</button>
             <button class="icon-btn" id="bgm-btn" onclick="toggleBGM()">🎵</button>
             <div class="dist-tracker" id="total-walked">🚶 0.00 km</div>
         </div>
@@ -369,7 +370,7 @@
             <div class="radar-header">
                 <div>
                     <div class="radar-title">🌀 白海豚颱風 - 迴波動畫</div>
-                    <div class="radar-time" id="radar-time-tag">載入中...</div>
+                    <div class="radar-time" id="radar-time-tag">點擊開啟...</div>
                 </div>
                 <button class="pikmin-close-btn" style="position:static;" onclick="closeRadarModal()">✕</button>
             </div>
@@ -423,20 +424,17 @@
         let radarFrameIndex = 0;
         let radarAnimationTimer = null;
 
-        // ⚡ 精準計算 Viewport 高度（兼顧 iOS 與 Android LINE WebView）
         function updateViewportHeight() {
             const vh = window.innerHeight * 0.01;
             document.documentElement.style.setProperty('--vh', `${vh}px`);
             if (window.map) {
-                window.map.invalidateSize();
+                setTimeout(() => window.map.invalidateSize(), 150);
             }
         }
 
         window.addEventListener('resize', updateViewportHeight);
         window.addEventListener('orientationchange', updateViewportHeight);
-        window.addEventListener('DOMContentLoaded', updateViewportHeight);
 
-        // 🎯 景點資料庫（捷運站附照片）
         const spots = [
             { 
                 id: 1, name: '奇美博物館', lat: 22.9348, lng: 120.2260, desc: '西洋藝術與古典城堡建築', icon: 'coin_chimei.png', collected: false,
@@ -475,16 +473,48 @@
             },
             { 
                 id: 8, name: '三多商圈捷運站', lat: 22.6136, lng: 120.3043, desc: '高雄捷運紅線繁華商圈地標', icon: 'coin_mrt.png', 
-                photo: 'https://images.unsplash.com/photo-1517649763962-0c623266010b?w=600&auto=format&fit=crop', collected: false, noQuiz: true 
+                photo: 'https://images.unsplash.com/photo-1517649763962-0c623266010b?w=400&q=70', collected: false, noQuiz: true 
             },
             { 
                 id: 9, name: '美麗島捷運站', lat: 22.6314, lng: 120.3019, desc: '光之穹頂絕美藝術轉乘車站', icon: 'coin_mrt.png', 
-                photo: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=600&auto=format&fit=crop', collected: false, noQuiz: true 
+                photo: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400&q=70', collected: false, noQuiz: true 
             },
             { 
                 id: 10, name: '哈瑪星捷運站', lat: 22.6217, lng: 120.2758, desc: '銜接輕軌與哈瑪星鐵道園區樞紐', icon: 'coin_mrt.png', 
-                photo: 'https://images.unsplash.com/photo-1541888946425-d0fbb186a5b2?w=600&auto=format&fit=crop', collected: false, noQuiz: true 
-            }
+                photo: 'https://images.unsplash.com/photo-1541888946425-d0fbb186a5b2?w=400&q=70', collected: false, noQuiz: true 
+            },
+            
+            /* 🍱 駁二與鹽埕周邊 30 家精選美食（無照片、免問答） */
+            { id: 11, name: '鴨肉珍', lat: 22.6231, lng: 120.2818, desc: '經典古早味鴨肉飯與鴨肉切盤', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 12, name: '鴨肉本', lat: 22.6242, lng: 120.2805, desc: '鹽埕老字號當歸鴨與鴨肉飯', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 13, name: '港園牛肉麵', lat: 22.6219, lng: 120.2835, desc: '濃郁牛肉拌麵與經典滷味', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 14, name: '高雄婆婆冰創始店', lat: 22.6235, lng: 120.2812, desc: '傳統古早味水果冰與番茄切盤', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 15, name: '高雄婆婆冰旗艦店', lat: 22.6237, lng: 120.2811, desc: '夏季必吃芒果雪花冰與刨冰', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 16, name: '阿財雞絲麵', lat: 22.6258, lng: 120.2801, desc: '古早味雞絲麵與豐富黑白切', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 17, name: '阿英排骨飯', lat: 22.6251, lng: 120.2816, desc: '懷舊香酥古早味排骨飯', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 18, name: '汕頭天天沙茶火鍋', lat: 22.6212, lng: 120.2842, desc: '手工溫體牛與特製手工沙茶醬', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 19, name: '郭家肉粽', lat: 22.6272, lng: 120.2785, desc: '淋上特製花生醬汁的傳統肉粽', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 20, name: '米糕城', lat: 22.6238, lng: 120.2815, desc: '傳統筒仔米糕搭配魚鬆香茹', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 21, name: '樺達奶茶總店', lat: 22.6239, lng: 120.2821, desc: '鹽埕四十年老字號紅茶牛奶', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 22, name: '雙妃奶茶', lat: 22.6237, lng: 120.2825, desc: '加珍珠不加價的人氣特調奶茶', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 23, name: '松壹家金桔豆花', lat: 22.6241, lng: 120.2820, desc: '獨特金桔酸甜風味綿密豆花', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 24, name: '鹽埕王家豆花', lat: 22.6262, lng: 120.2808, desc: '特製金桔檸檬古早味手工豆花', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 25, name: '李家圓仔冰', lat: 22.6245, lng: 120.2809, desc: '現煮Q彈湯圓與古早味八寶冰', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 26, name: '尚芳豆芽魚肚丸', lat: 22.6218, lng: 120.2826, desc: '鮮美虱目魚丸湯與脆皮魚皮', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 27, name: '鹽埕吳家金豆花', lat: 22.6208, lng: 120.2829, desc: '濃郁香醇的古早味焦香豆花', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 28, name: '廣東鴨庄', lat: 22.6230, lng: 120.2838, desc: '超人氣排隊港式燒臘便當', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 29, name: '佬廣香排骨飯', lat: 22.6225, lng: 120.2810, desc: '古早味炸排骨與酥炸雞腿飯', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 30, name: '鹽埕小黑輪', lat: 22.6205, lng: 120.2808, desc: '大腸包小腸與炭烤香氣黑輪片', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 31, name: '天池冬瓜茶', lat: 22.6248, lng: 120.2800, desc: '遵循古法熬煮濃郁冬瓜磚飲品', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 32, name: '鹽埕小西點', lat: 22.6212, lng: 120.2818, desc: '復古台式小西點與古早味糕點', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 33, name: '鹽埕燒肉飯', lat: 22.6228, lng: 120.2822, desc: '直火炭烤香濃醬汁燒肉飯', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 34, name: 'NOW & THEN by nybc', lat: 22.6189, lng: 120.2815, desc: '駁二倉庫工業風早午餐咖啡店', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 35, name: '微熱山丘 高雄駁二店', lat: 22.6185, lng: 120.2825, desc: '奉茶與經典土鳳梨酥體驗空間', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 36, name: '永心鳳茶 駁二倉7庫', lat: 22.6178, lng: 120.2822, desc: '台茶與精緻台菜時尚餐飲', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 37, name: '典藏駁二餐廳 ARTCO', lat: 22.6192, lng: 120.2802, desc: '融合當代藝術與義式料理空間', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 38, name: '吧沐 BAMU BAR', lat: 22.6201, lng: 120.2820, desc: '駁二周邊風格酒吧與特色特調', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 39, name: '哈瑪星黑輪伯', lat: 22.6218, lng: 120.2725, desc: '鼓山老街古早味關東煮與黑輪湯', icon: 'coin_pier2.png', collected: false, noQuiz: true },
+            { id: 40, name: '代天宮廟口美食小吃', lat: 22.6228, lng: 120.2718, desc: '哈瑪星廟口麵線糊與烤香腸', icon: 'coin_pier2.png', collected: false, noQuiz: true }
         ];
 
         let userCoords = [22.6250, 120.3000];
@@ -539,12 +569,12 @@
                     const distMeters = getDistance(lastData.lat, lastData.lng, newCoords[0], newCoords[1]);
                     if (distMeters >= 10) {
                         totalDistanceMeters += distMeters;
-                        showToast(`🚗 歡迎回來！離線期間採計了 ${(distMeters / 1000).toFixed(2)} km！`);
+                        showToast(`🚗 離線期間採計了 ${(distMeters / 1000).toFixed(2)} km！`);
                         saveLocalState();
                         syncDataToGAS();
                     }
                 }
-            } catch (e) { console.error('離線距離計算失敗', e); }
+            } catch (e) {}
         }
 
         document.addEventListener('visibilitychange', () => {
@@ -557,11 +587,11 @@
             let baseTime = new Date(now.getTime() - 15 * 60 * 1000);
             baseTime.setMinutes(Math.floor(baseTime.getMinutes() / 10) * 10, 0, 0);
 
-            for (let i = 12; i >= 0; i--) {
-                const t = new Date(baseTime.getTime() - i * 10 * 60 * 1000);
+            for (let i = 4; i >= 0; i--) {
+                const t = new Date(baseTime.getTime() - i * 20 * 60 * 1000);
                 const YYYY = t.getFullYear(), MM = String(t.getMonth() + 1).padStart(2, '0'), DD = String(t.getDate()).padStart(2, '0');
                 const HH = String(t.getHours()).padStart(2, '0'), mm = String(t.getMinutes()).padStart(2, '0');
-                frames.push({ url: `https://www.cwa.gov.tw/Data/radar/CV1_3600_${YYYY}${MM}${DD}${HH}${mm}.png`, timeStr: `${YYYY}-${MM}-${DD} ${HH}:${mm}` });
+                frames.push({ url: `https://www.cwa.gov.tw/Data/radar/CV1_3600_${YYYY}${MM}${DD}${HH}${mm}.png`, timeStr: `${HH}:${mm}` });
             }
             return frames;
         }
@@ -573,13 +603,18 @@
             const radarImg = document.getElementById('radar-img');
             const timeTag = document.getElementById('radar-time-tag');
 
+            if (radarFrames.length > 0) {
+                radarImg.src = radarFrames[0].url;
+                timeTag.innerText = `▶ ${radarFrames[0].timeStr}`;
+            }
+
             radarAnimationTimer = setInterval(() => {
                 if (radarFrames.length === 0) return;
+                radarFrameIndex = (radarFrameIndex + 1) % radarFrames.length;
                 const currentFrame = radarFrames[radarFrameIndex];
                 radarImg.src = currentFrame.url;
                 timeTag.innerText = `▶ ${currentFrame.timeStr}`;
-                radarFrameIndex = (radarFrameIndex + 1) % radarFrames.length;
-            }, 100);
+            }, 600);
         }
 
         function stopRadarAnimation() {
@@ -598,32 +633,40 @@
         }
 
         function fetchRoadName(lat, lng) {
-            if (lastGeocodeCoords && getDistance(lastGeocodeCoords[0], lastGeocodeCoords[1], lat, lng) < 30) return;
+            if (lastGeocodeCoords && getDistance(lastGeocodeCoords[0], lastGeocodeCoords[1], lat, lng) < 50) return;
             lastGeocodeCoords = [lat, lng];
 
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=zh-TW`)
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
                 .then(res => res.json())
                 .then(data => {
                     if (data && data.address) {
                         const addr = data.address;
-                        const fullAddress = [addr.city || addr.county || '', addr.suburb || addr.town || addr.district || '', addr.road || addr.pedestrian || ''].filter(Boolean).join(' ');
+                        const fullAddress = [addr.suburb || addr.district || '', addr.road || addr.pedestrian || ''].filter(Boolean).join(' ');
                         document.getElementById('road-name').innerText = fullAddress ? `📍 ${fullAddress}` : '📍 高雄探索中';
                     }
-                }).catch(() => { document.getElementById('road-name').innerText = `📍 搜尋路名中...`; });
+                }).catch(() => { document.getElementById('road-name').innerText = `📍 高雄探索中`; });
         }
 
+        // 🗺️ 初始化地圖（使用 MapTiler Aquarelle 水彩風格圖資）
         function initMap() {
             updateViewportHeight();
             const taiwanBounds = L.latLngBounds(L.latLng(20.5, 118.0), L.latLng(26.5, 124.0));
 
             map = L.map('map', {
-                zoomControl: false, attributionControl: false,
-                minZoom: 7, maxZoom: 18,
-                maxBounds: taiwanBounds, maxBoundsViscosity: 1.0
-            }).setView(userCoords, 16);
+                zoomControl: false, 
+                attributionControl: false,
+                minZoom: 8, 
+                maxZoom: 18,
+                maxBounds: taiwanBounds, 
+                maxBoundsViscosity: 1.0
+            }).setView(userCoords, 15);
 
+            // 🎨 MapTiler Aquarelle 水彩風格圖資
             L.tileLayer('https://api.maptiler.com/maps/aquarelle-v4/256/{z}/{x}/{y}.png?key=DDhwtFjCbEWiteavezOK', {
-                minZoom: 7, maxZoom: 18, noWrap: true
+                tileSize: 256,
+                minZoom: 1,
+                maxZoom: 19,
+                crossOrigin: true
             }).addTo(map);
 
             const playerIcon = L.divIcon({
@@ -667,7 +710,6 @@
             document.getElementById('pikmin-spot-desc').innerText = spot.desc;
             renderPikminQuiz();
             document.getElementById('pikmin-modal').style.display = 'flex';
-            updateViewportHeight();
         }
 
         function closePikminModal(e) {
@@ -802,17 +844,19 @@
             } else {
                 const cachedUser = localStorage.getItem('takaowalk_user');
                 if (cachedUser) {
-                    const userData = JSON.parse(cachedUser);
-                    if (userData.lineId && userData.lineId !== 'test_guest') {
-                        currentLineId = userData.lineId;
-                        currentName = userData.name;
-                        totalDistanceMeters = userData.distMeters || 0;
-                        if (userData.collectedSpots) {
-                            spots.forEach(s => { if (userData.collectedSpots.includes(s.id)) s.collected = true; });
+                    try {
+                        const userData = JSON.parse(cachedUser);
+                        if (userData.lineId && userData.lineId !== 'test_guest') {
+                            currentLineId = userData.lineId;
+                            currentName = userData.name;
+                            totalDistanceMeters = userData.distMeters || 0;
+                            if (userData.collectedSpots) {
+                                spots.forEach(s => { if (userData.collectedSpots.includes(s.id)) s.collected = true; });
+                            }
+                            enterGameUI();
+                            return;
                         }
-                        enterGameUI();
-                        return;
-                    }
+                    } catch(e){}
                 }
                 document.getElementById('login-overlay').style.display = 'flex';
             }
@@ -841,7 +885,7 @@
             if (!currentLineId || currentLineId === 'test_guest') return;
             const collectedSpotIds = spots.filter(s => s.collected).map(s => s.id).join(',');
             const km = (totalDistanceMeters / 1000).toFixed(2);
-            fetch(`${GAS_API_URL}?action=updateData&line_id=${encodeURIComponent(currentLineId)}&dist=${km}&spots=${encodeURIComponent(collectedSpotIds)}`, { mode: 'no-cors' });
+            fetch(`${GAS_API_URL}?action=updateData&line_id=${encodeURIComponent(currentLineId)}&dist=${km}&spots=${encodeURIComponent(collectedSpotIds)}`, { mode: 'no-cors' }).catch(()=>{});
         }
 
         function getDistance(lat1, lon1, lat2, lon2) {
@@ -901,8 +945,8 @@
             if (navigator.geolocation) {
                 navigator.geolocation.watchPosition(
                     pos => updatePlayerPosition([pos.coords.latitude, pos.coords.longitude]),
-                    err => console.log('GPS 權限未開啟'),
-                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                    err => console.log('GPS 存取限制'),
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 3000 }
                 );
             }
         }
@@ -910,14 +954,13 @@
         function showToast(msg) {
             const toast = document.getElementById('toast');
             toast.innerText = msg; toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 3500);
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
         }
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
         window.onload = () => {
             initMap();
-            updateViewportHeight();
         };
     </script>
 </body>
